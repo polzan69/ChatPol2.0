@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import MessageBox from '../components/messageBox';
@@ -10,6 +10,13 @@ function Login() {
     const [messageType, setMessageType] = useState('');
     const navigate = useNavigate();
 
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        if (token) {
+            navigate('/dashboard');
+        }
+    }, [navigate]);
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
@@ -19,6 +26,7 @@ function Login() {
             });
 
             if (response.status === 200) {
+                localStorage.setItem('token', response.data.token);
                 setMessage('Login successful!');
                 setMessageType('success');
                 setTimeout(() => navigate('/dashboard'), 3000); // Redirect after 3 seconds
