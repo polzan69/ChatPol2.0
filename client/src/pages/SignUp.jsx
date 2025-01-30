@@ -9,19 +9,32 @@ function SignUp() {
     const [age, setAge] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [profilePicture, setProfilePicture] = useState(null);
     const [message, setMessage] = useState('');
     const [messageType, setMessageType] = useState('');
     const navigate = useNavigate();
 
+    const handleFileChange = (e) => {
+        setProfilePicture(e.target.files[0]);
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+        const formData = new FormData();
+        formData.append('firstName', firstName);
+        formData.append('lastName', lastName);
+        formData.append('age', age);
+        formData.append('email', email);
+        formData.append('password', password);
+        if (profilePicture) {
+            formData.append('profilePicture', profilePicture);
+        }
+
         try {
-            const response = await axios.post('http://localhost:5000/api/users/signup', {
-                firstName,
-                lastName,
-                age,
-                email,
-                password,
+            const response = await axios.post('http://localhost:5000/api/users/signup', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
             });
 
             if (response.status === 201) {
@@ -83,6 +96,11 @@ function SignUp() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
+                />
+                <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileChange}
                 />
                 <button type="submit">Sign Up</button>
             </form>

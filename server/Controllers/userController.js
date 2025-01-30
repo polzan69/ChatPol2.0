@@ -16,9 +16,7 @@ const signUp = async (req, res) => {
                 .resize(250, 250)
                 .toFile(resizedImagePath);
 
-            // Optionally, delete the original uploaded file
-            fs.unlinkSync(profilePicturePath); // Delete the original file
-            // Update the path to the resized image in the user object
+            fs.unlinkSync(profilePicturePath);
             profilePicturePath = resizedImagePath;
         }
 
