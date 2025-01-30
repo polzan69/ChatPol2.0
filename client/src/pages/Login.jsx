@@ -27,6 +27,13 @@ function Login() {
 
             if (response.status === 200) {
                 localStorage.setItem('token', response.data.token);
+                // Fetch user data after login
+                const userResponse = await axios.get(`http://localhost:5000/api/users/get/${response.data.user._id}`, {
+                    headers: {
+                        Authorization: `Bearer ${response.data.token}`,
+                    },
+                });
+                localStorage.setItem('currentUser', JSON.stringify(userResponse.data)); // Store user data
                 setMessage('Login successful!');
                 setMessageType('success');
                 setTimeout(() => navigate('/dashboard'), 3000); // Redirect after 3 seconds
