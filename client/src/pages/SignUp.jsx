@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import MessageBox from '../components/messageBox';
 
 function SignUp() {
     const [firstName, setFirstName] = useState('');
@@ -8,6 +9,8 @@ function SignUp() {
     const [age, setAge] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [message, setMessage] = useState('');
+    const [messageType, setMessageType] = useState('');
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
@@ -21,21 +24,29 @@ function SignUp() {
                 password,
             });
 
-            // Redirect to login page after successful sign-up
             if (response.status === 201) {
-                navigate('/');
+                setMessage('Account created successfully! You can now log in.');
+                setMessageType('success');
+                setTimeout(() => navigate('/'), 3000); // Redirect after 3 seconds
             }
         } catch (error) {
             if (error.response) {
-                alert(error.response.data.message);
+                setMessage(error.response.data.message);
+                setMessageType('error');
             } else {
                 console.error('Error:', error);
             }
         }
     };
 
+    const handleCloseMessage = () => {
+        setMessage('');
+        setMessageType('');
+    };
+
     return (
         <div>
+            {message && <MessageBox message={message} type={messageType} onClose={handleCloseMessage} />}
             <h1>Sign Up</h1>
             <form onSubmit={handleSubmit}>
                 <input

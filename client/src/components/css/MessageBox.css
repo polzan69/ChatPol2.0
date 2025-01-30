@@ -1,0 +1,75 @@
+.message-box {
+    position: absolute;
+    top: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 15px 70px;
+    border: 10px double white;
+    border-radius: 25px;
+    color: white;
+    font-weight: bold;
+    z-index: 1000;
+    transition: opacity 0.5s ease, transform 0.5s ease;
+    opacity: 1;
+    cursor: pointer;
+}
+
+.message-box.success {
+    background-color: #4CAF50;
+}
+
+.message-box.error {
+    background-color: #f44336;
+}
+
+.message-box i {
+    position: absolute;
+    font-size: 40px;
+    left: 15px;
+    top: 15px;
+}
+
+.close-button {
+    background: none;
+    border: 3px solid white;
+    border-radius: 20px;
+    padding: 5px 10px;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    position: absolute;
+    right: 12px;
+    top: 15px;
+}
+
+.loading-slider {
+    position: relative;
+    height: 5px;
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 5px;
+    overflow: hidden;
+    margin-top: 10px;
+}
+
+.slider {
+    height: 100%;
+    background-color: white;
+    transition: width 1s linear; /* Smooth transition for the slider */
+}
+
+.fade-in {
+    animation: fadeIn 0.15s ease-in;
+}
+
+.fade-out {
+    animation: fadeOut 1s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
