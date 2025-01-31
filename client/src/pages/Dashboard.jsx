@@ -46,8 +46,9 @@ const Dashboard = () => {
                             className={`user-item ${user.status ? user.status.toLowerCase() : 'offline'}`} 
                             onClick={() => handleUserClick(user._id)}
                         >
-                            <img src={user.profilePicture} alt={user.firstName} className="user-profile-picture" />
-                            <span>{user.firstName} {user.lastName} ({user.email}) - {user.status}</span> {/* Display name and email */}
+                            <div className={`status-indicator ${user.status === 'Online' ? 'online' : 'offline'}`}></div>
+                            <img src={user.profilePicture ? `http://localhost:5000/${user.profilePicture}` : ''} alt={user.firstName} className="user-profile-picture" />
+                            <span>{user.firstName} {user.lastName} ({user.email})</span>
                         </div>
                     ))}
                 </div>

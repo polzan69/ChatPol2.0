@@ -10,7 +10,9 @@
 }
 
 .user-list {
-    width: 250px;
+    width: 30%;
+    max-width: 450px;
+    min-width: 400px;
     background-color: #f4f4f4;
     padding: 10px;
     border-right: 1px solid #ccc;
@@ -23,6 +25,9 @@
     padding: 10px;
     cursor: pointer;
     transition: background-color 0.3s;
+    background-color: #ffffff;
+    margin-bottom: 5px;
+    border-radius: 25px;
 }
 
 .user-item:hover {
@@ -34,6 +39,7 @@
     height: 40px;
     border-radius: 50%;
     margin-right: 10px;
+    border: 2px solid black;
 }
 
 .status-indicator {
@@ -41,6 +47,7 @@
     height: 10px;
     border-radius: 50%;
     margin-right: 10px;
+    margin-left: 5px;
 }
 
 .status-indicator.online {
