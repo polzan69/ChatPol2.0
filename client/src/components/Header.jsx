@@ -1,11 +1,20 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import './css/Header.css';
 
 const Header = ({ userName, profilePicture }) => {
     const navigate = useNavigate();
 
-    const handleLogout = () => {
+    const handleLogout = async () => {
+        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        if (currentUser) {
+            await axios.put(`http://localhost:5000/api/users/updateStatus/${currentUser._id}`, { status: 'Offline' }, {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                },
+            });
+        }
         localStorage.removeItem('token');
         localStorage.removeItem('currentUser'); // Clear current user on logout
         navigate('/');

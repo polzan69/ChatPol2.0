@@ -34,6 +34,14 @@ function Login() {
                     },
                 });
                 localStorage.setItem('currentUser', JSON.stringify(userResponse.data)); // Store user data
+
+                // Update user status to Online
+                await axios.put(`http://localhost:5000/api/users/updateStatus/${response.data.user._id}`, { status: 'Online' }, {
+                    headers: {
+                        Authorization: `Bearer ${response.data.token}`,
+                    },
+                });
+
                 setMessage('Login successful!');
                 setMessageType('success');
                 setTimeout(() => navigate('/dashboard'), 3000); // Redirect after 3 seconds
