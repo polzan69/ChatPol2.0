@@ -46,11 +46,11 @@ const login = async (req, res) => {
 //Get existing users
 const getUsers = async (req, res) => {
     try {
-        const users = await User.find({}, 'email');
+        const users = await User.find({}, 'firstName lastName email status');
         return res.status(200).json(users);
     } catch (error) {
-        console.error('Error fetching emails: ', error);
-        return res.status(500).json({ error: 'An error occurred while fetching emails' });
+        console.error('Error fetching users: ', error);
+        return res.status(500).json({ error: 'An error occurred while fetching users' });
     }
 };
 
@@ -67,9 +67,26 @@ const getUserById = async (req, res) => {
     }
 };
 
+const updateStatus = async (req, res) => {
+    const { id } = req.params;
+    const { status } = req.body; // Expecting { status: 'Online' | 'Offline' }
+
+    try {
+        const user = await User.findByIdAndUpdate(id, { status }, { new: true });
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        res.status(200).json(user);
+    } catch (error) {
+        console.error('Error updating user status:', error);
+        res.status(500).json({ error: 'An error occurred while updating user status' });
+    }
+};
+
 module.exports = { 
     signUp, 
     login,
     getUsers,
-    getUserById
+    getUserById,
+    updateStatus
 };

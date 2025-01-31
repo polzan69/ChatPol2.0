@@ -9,6 +9,7 @@ const userSchema = new mongoose.Schema({
     password: { type: String, required: true },
     profilePicture: { type: String },
     socketId: { type: String },
+    status: { type: String, enum: ['Online', 'Offline'], default: 'Offline' },
 });
 
 // Encrypts password before saving

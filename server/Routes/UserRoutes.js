@@ -3,7 +3,8 @@ const express = require('express');
 const { signUp,
         login,
         getUsers,
-        getUserById
+        getUserById,
+        updateStatus
 } = require('../Controllers/userController');
 
 const authMiddleware = require('../Middlewares/authMiddleware');
@@ -16,5 +17,6 @@ router.post('/login', login);
 // router.get('/get', authMiddleware, getUsers); if with auth
 router.get('/get',  getUsers);
 router.get('/get/:id', authMiddleware, getUserById);
+router.put('/updateStatus/:id', authMiddleware, updateStatus);
 
 module.exports = router;

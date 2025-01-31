@@ -25,6 +25,11 @@ app.use('/uploads', express.static('uploads'));
 io.on('connection', (socket) => {
     console.log('New client connected');
 
+    // Update user status to Online
+    User.findByIdAndUpdate(socket.userId, { status: 'Online' }, { new: true })
+        .then(user => console.log(`User ${user.firstName} is now Online`))
+        .catch(err => console.error(err));
+
     // Listen for incoming messages
     socket.on('sendMessage', async (data) => {
         const { sender, receiver, content } = data;
@@ -40,6 +45,11 @@ io.on('connection', (socket) => {
     // Handle disconnection
     socket.on('disconnect', () => {
         console.log('Client disconnected');
+
+        // Update user status to Offline
+        User.findByIdAndUpdate(socket.userId, { status: 'Offline' }, { new: true })
+            .then(user => console.log(`User ${user.firstName} is now Offline`))
+            .catch(err => console.error(err));
     });
 });
 
