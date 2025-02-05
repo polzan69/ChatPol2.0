@@ -27,7 +27,7 @@
     transition: background-color 0.3s;
     background-color: #ffffff;
     margin-bottom: 5px;
-    border-radius: 25px;
+    border-radius: 80px;
 }
 
 .user-item:hover {
@@ -39,15 +39,16 @@
     height: 40px;
     border-radius: 50%;
     margin-right: 10px;
+    margin-left: 5px;
     border: 2px solid black;
 }
 
 .status-indicator {
-    width: 10px;
-    height: 10px;
+    width: 15px;
+    height: 15px;
     border-radius: 50%;
     margin-right: 10px;
-    margin-left: 5px;
+    margin-left: 10px;
 }
 
 .status-indicator.online {

@@ -3,22 +3,19 @@ import Header from '../components/Header';
 import axios from 'axios';
 import './css/Dashboard.css';
 import io from 'socket.io-client';
-import MessageBox from '../components/messageBox';
 
 const socket = io('http://localhost:5000', {
-    transports: ['websocket'], // Use WebSocket transport
-    withCredentials: true // Include credentials
+    transports: ['websocket'],
+    withCredentials: true
 });
 
 const Dashboard = () => {
     const [users, setUsers] = useState([]);
     const [messages, setMessages] = useState([]);
     const [selectedUser, setSelectedUser] = useState(null);
-    const [logoutMessage, setLogoutMessage] = useState(''); // State for logout message
     const currentUser = JSON.parse(localStorage.getItem('currentUser'));
 
     useEffect(() => {
-        // Fetch registered users
         const fetchUsers = async () => {
             try {
                 const response = await axios.get('http://localhost:5000/api/users/get');
@@ -30,7 +27,6 @@ const Dashboard = () => {
 
         fetchUsers();
 
-        // Listen for user status updates
         socket.on('userStatusUpdate', (data) => {
             setUsers((prevUsers) => 
                 prevUsers.map((user) => 
@@ -41,13 +37,12 @@ const Dashboard = () => {
         });
 
         return () => {
-            socket.off('userStatusUpdate'); // Clean up the listener on component unmount
+            socket.off('userStatusUpdate');
         };
     }, []);
 
     const handleUserClick = async (userId) => {
         setSelectedUser(userId);
-        // Fetch messages for the selected user
         try {
             const response = await axios.get(`http://localhost:5000/api/messages/${userId}`);
             setMessages(response.data);
@@ -58,26 +53,11 @@ const Dashboard = () => {
 
     if (!currentUser) {
         localStorage.removeItem('token');
-        localStorage.removeItem('currentUser');
-        return (
-            <div>
-                <h2>Please log in to access the dashboard.</h2>
-            </div>
-        );
     }
-
-    // Handle logout message display
-    const handleLogoutMessage = () => {
-        setLogoutMessage('You are being logged out...');
-        setTimeout(() => {
-            setLogoutMessage(''); // Clear message after 3 seconds
-        }, 3000);
-    };
 
     return (
         <div className="dashboard">
-            <Header userName={currentUser.firstName} profilePicture={currentUser.profilePicture} onLogout={handleLogoutMessage} />
-            {logoutMessage && <MessageBox message={logoutMessage} type="error" onClose={() => setLogoutMessage('')} />}
+            <Header userName={currentUser.firstName} profilePicture={currentUser.profilePicture} />
             <div className="dashboard-content">
                 <div className="user-list">
                     <h2>Users</h2>
