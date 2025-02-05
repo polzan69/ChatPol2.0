@@ -14,6 +14,12 @@
 .header-title {
     font-size: 24px;
     font-weight: bold;
+    background-color: white;
+    color: #4185b3;
+    padding: 10px 20px;
+    border-radius: 40px;
+    margin-left: 10px;
+    border: 10px double #4185b3;
 }
 
 .header-user {
@@ -22,22 +28,31 @@
 }
 
 .profile-picture {
-    width: 50px;
-    height: 50px;
+    width: 60px;
+    height: 60px;
     border-radius: 50%;
-    margin-right: 20px;
     background-color: white;
-    border: 3px solid black;
+    /* border: 3px solid black; */
+    border: 10px double #4185b3;
 }
 
 .user-name {
-    margin-right: 10px;
+    margin: 0 20px 0 20px;
+    font-size: 1.2rem;
+    font-weight: bold;
 }
 
 .logout-button {
-    background-color: transparent;
-    border: none;
-    color: white;
+    background-color: white;
+    border: 10px double #4185b3;
+    color: #4185b3;
     cursor: pointer;
     font-size: 16px;
+    border-radius: 30px;
+}
+
+.logout-button:hover{
+    background-color: #1573b3;
+    color: white;
+    border: 10px double white;
 }
