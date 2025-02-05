@@ -40,6 +40,12 @@ io.on('connection', (socket) => {
         io.emit('userStatusUpdate', { userId, status: 'Online' });
     });
 
+    socket.on('userLogout', async (userId) => {
+        // Emit an event to all clients to update the user status
+        io.emit('userStatusUpdate', { userId, status: 'Offline' });
+        console.log(`User ${userId} has logged out`);
+    });
+
     // Listen for incoming messages
     socket.on('sendMessage', async (data) => {
         const { sender, receiver, content } = data;
@@ -69,3 +75,4 @@ app.use('/api/users', userRoutes);
 server.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
+
