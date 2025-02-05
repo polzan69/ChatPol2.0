@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import ProfileEditModal from './ProfileEditModal';
 import './css/Header.css';
 import socket from '../socket'; // Import the centralized socket
 
-const Header = ({ userName, profilePicture }) => {
+const Header = ({ user, onUpdate }) => {
     const navigate = useNavigate();
     const [isLoggingOut, setIsLoggingOut] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     useEffect(() => {
         socket.on('connect', () => {
@@ -45,17 +47,33 @@ const Header = ({ userName, profilePicture }) => {
         }, 2000);
     };
 
-    console.log('Profile Picture URL:', profilePicture);
+    const handleOpenModal = () => {
+        setIsModalOpen(true);
+    };
 
-    //this works
-    const profilePictureUrl = profilePicture ? `http://localhost:5000/${profilePicture}` : '';
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+    };
+
+    const handleUpdate = (updatedUser) => {
+        onUpdate(updatedUser);
+    };
+
+    if (!user) {
+        return null;
+    }
 
     return (
         <header className="header">
             <div className="header-title">ChatPol</div>
             <div className="header-user">
-                {profilePictureUrl && <img src={profilePictureUrl} alt="Profile" className="profile-picture" />}
-                <span className="user-name">{userName}</span>
+                <img 
+                    src={user.profilePicture ? `http://localhost:5000/${user.profilePicture}` : ''} 
+                    alt="Profile" 
+                    className="profile-picture" 
+                    onClick={handleOpenModal}
+                />
+                <span className="user-name">{user.firstName} {user.lastName}</span>
                 <button 
                     className="logout-button" 
                     onClick={handleLogout} 
@@ -64,6 +82,12 @@ const Header = ({ userName, profilePicture }) => {
                     {isLoggingOut ? 'Logging out...' : 'Logout'}
                 </button>
             </div>
+            <ProfileEditModal 
+                isOpen={isModalOpen} 
+                onClose={handleCloseModal} 
+                user={user} 
+                onUpdate={handleUpdate} 
+            />
         </header>
     );
 };

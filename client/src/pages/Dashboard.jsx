@@ -9,17 +9,17 @@ const Dashboard = () => {
     const [users, setUsers] = useState([]);
     const [messages, setMessages] = useState([]);
     const [selectedUser, setSelectedUser] = useState(null);
+    const [currentUser, setCurrentUser] = useState(null);
     const navigate = useNavigate();
-    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-
-    // Redirect to login if currentUser is null
-    useEffect(() => {
-        if (!currentUser) {
-            navigate('/');
-        }
-    }, [currentUser, navigate]);
 
     useEffect(() => {
+        const fetchCurrentUser = async () => {
+            const userData = JSON.parse(localStorage.getItem('currentUser'));
+            setCurrentUser(userData);
+        };
+
+        fetchCurrentUser();
+
         const fetchUsers = async () => {
             try {
                 const response = await axios.get('http://localhost:5000/api/users/get');
@@ -57,9 +57,7 @@ const Dashboard = () => {
 
     return (
         <div className="dashboard">
-            {currentUser && (
-                <Header userName={currentUser.firstName} profilePicture={currentUser.profilePicture} />
-            )}
+            <Header user={currentUser} onUpdate={setCurrentUser} />
             <div className="dashboard-content">
                 <div className="user-list">
                     <h2>Users</h2>
