@@ -2,18 +2,22 @@ import React, { useEffect, useState } from 'react';
 import Header from '../components/Header';
 import axios from 'axios';
 import './css/Dashboard.css';
-import io from 'socket.io-client';
-
-const socket = io('http://localhost:5000', {
-    transports: ['websocket'],
-    withCredentials: true
-});
+import socket from '../socket'; // Import the centralized socket
+import { useNavigate } from 'react-router-dom';
 
 const Dashboard = () => {
     const [users, setUsers] = useState([]);
     const [messages, setMessages] = useState([]);
     const [selectedUser, setSelectedUser] = useState(null);
+    const navigate = useNavigate();
     const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+
+    // Redirect to login if currentUser is null
+    useEffect(() => {
+        if (!currentUser) {
+            navigate('/');
+        }
+    }, [currentUser, navigate]);
 
     useEffect(() => {
         const fetchUsers = async () => {
@@ -37,7 +41,7 @@ const Dashboard = () => {
         });
 
         return () => {
-            socket.off('userStatusUpdate');
+            // Do not disconnect the socket here
         };
     }, []);
 
@@ -51,13 +55,11 @@ const Dashboard = () => {
         }
     };
 
-    if (!currentUser) {
-        localStorage.removeItem('token');
-    }
-
     return (
         <div className="dashboard">
-            <Header userName={currentUser.firstName} profilePicture={currentUser.profilePicture} />
+            {currentUser && (
+                <Header userName={currentUser.firstName} profilePicture={currentUser.profilePicture} />
+            )}
             <div className="dashboard-content">
                 <div className="user-list">
                     <h2>Users</h2>

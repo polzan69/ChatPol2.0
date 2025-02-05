@@ -2,14 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './css/Header.css';
-import { io } from 'socket.io-client';
+import socket from '../socket'; // Import the centralized socket
 
-const socket = io('http://localhost:5000', {
-    transports: ['websocket'],
-    withCredentials: true
-});
-
-const Header = ({ userName, profilePicture}) => {
+const Header = ({ userName, profilePicture }) => {
     const navigate = useNavigate();
     const [isLoggingOut, setIsLoggingOut] = useState(false);
 
@@ -19,7 +14,7 @@ const Header = ({ userName, profilePicture}) => {
         });
 
         return () => {
-            socket.disconnect();
+            // Do not disconnect the socket here
         };
     }, []);
 

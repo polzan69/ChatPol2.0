@@ -41,6 +41,9 @@ io.on('connection', (socket) => {
     });
 
     socket.on('userLogout', async (userId) => {
+        // Update user status to Offline in the database
+        await User.findByIdAndUpdate(userId, { status: 'Offline' });
+
         // Emit an event to all clients to update the user status
         io.emit('userStatusUpdate', { userId, status: 'Offline' });
         console.log(`User ${userId} has logged out`);
