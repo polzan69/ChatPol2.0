@@ -43,6 +43,23 @@ const login = async (req, res) => {
     }
 };
 
+const logout = async (req, res) => {
+    const { id } = req.params; // Get user ID from request parameters
+
+    try {
+        const user = await User.findByIdAndUpdate(id, { status: 'Offline' }, { new: true });
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        // Optionally, you can also clear the socketId if needed
+        await User.findByIdAndUpdate(id, { socketId: null }, { new: true });
+        res.status(200).json({ message: 'User logged out successfully', user });
+    } catch (error) {
+        console.error('Error logging out user:', error);
+        res.status(500).json({ error: 'An error occurred while logging out' });
+    }
+};
+
 //Get existing users
 const getUsers = async (req, res) => {
     try {
@@ -86,6 +103,7 @@ const updateStatus = async (req, res) => {
 module.exports = { 
     signUp, 
     login,
+    logout,
     getUsers,
     getUserById,
     updateStatus

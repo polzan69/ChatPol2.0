@@ -5,6 +5,7 @@ const http = require('http');
 const socketIo = require('socket.io');
 require('dotenv').config();
 
+const User = require('./Models/User');
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server); 
@@ -12,7 +13,13 @@ const userRoutes = require('./Routes/UserRoutes');
 
 const PORT = process.env.PORT || 5000;
 
-app.use(cors());
+// Configure CORS to allow requests from your frontend
+app.use(cors({
+    origin: 'http://localhost:5173', // Allow requests from this origin
+    methods: ['GET', 'POST', 'PUT', 'DELETE'], // Specify allowed methods
+    credentials: true // Allow credentials (cookies, authorization headers, etc.)
+}));
+
 app.use(express.json());
 
 mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
@@ -21,14 +28,17 @@ mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTop
 
 app.use('/uploads', express.static('uploads')); 
 
-// WebSocket connection
+//Test WebSocket connection
 io.on('connection', (socket) => {
-    console.log('New client connected');
+    console.log('New client connected:', socket.id);
 
-    // Update user status to Online
-    User.findByIdAndUpdate(socket.userId, { status: 'Online' }, { new: true })
-        .then(user => console.log(`User ${user.firstName} is now Online`))
-        .catch(err => console.error(err));
+    socket.on('registerUser', async (userId) => {
+        const user = await User.findByIdAndUpdate(userId, { socketId: socket.id, status: 'Online' }, { new: true });
+        console.log(`User ${userId} is now Online`, user);
+        
+        // Emit an event to all clients to update the user status
+        io.emit('userStatusUpdate', { userId, status: 'Online' });
+    });
 
     // Listen for incoming messages
     socket.on('sendMessage', async (data) => {
@@ -42,14 +52,14 @@ io.on('connection', (socket) => {
         socket.to(receiver).emit('receiveMessage', message);
     });
 
-    // Handle disconnection
-    socket.on('disconnect', () => {
-        console.log('Client disconnected');
-
-        // Update user status to Offline
-        User.findByIdAndUpdate(socket.userId, { status: 'Offline' }, { new: true })
-            .then(user => console.log(`User ${user.firstName} is now Offline`))
-            .catch(err => console.error(err));
+    socket.on('disconnect', async () => {
+        console.log('Client disconnected:', socket.id);
+        
+        // Check if the user is still logged in
+        const user = await User.findOne({ socketId: socket.id });
+        if (user) {
+            console.log(`User ${user.firstName} is now Offline`);
+        }
     });
 });
 

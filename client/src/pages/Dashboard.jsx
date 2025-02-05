@@ -2,6 +2,12 @@ import React, { useEffect, useState } from 'react';
 import Header from '../components/Header';
 import axios from 'axios';
 import './css/Dashboard.css';
+import io from 'socket.io-client';
+
+const socket = io('http://localhost:5000', {
+    transports: ['websocket'], // Use WebSocket transport
+    withCredentials: true // Include credentials
+});
 
 const Dashboard = () => {
     const [users, setUsers] = useState([]);
@@ -13,7 +19,7 @@ const Dashboard = () => {
         // Fetch registered users
         const fetchUsers = async () => {
             try {
-                const response = await axios.get('http://localhost:5000/api/users/get'); // Adjust the URL if needed
+                const response = await axios.get('http://localhost:5000/api/users/get');
                 setUsers(response.data);
             } catch (error) {
                 console.error('Error fetching users:', error);
@@ -21,6 +27,20 @@ const Dashboard = () => {
         };
 
         fetchUsers();
+
+        // Listen for user status updates
+        socket.on('userStatusUpdate', (data) => {
+            setUsers((prevUsers) => 
+                prevUsers.map((user) => 
+                    user._id === data.userId ? { ...user, status: data.status } : user
+                )
+            );
+            console.log(`User ${data.userId} status updated to ${data.status}`);
+        });
+
+        return () => {
+            socket.off('userStatusUpdate'); // Clean up the listener on component unmount
+        };
     }, []);
 
     const handleUserClick = async (userId) => {
@@ -62,10 +82,10 @@ const Dashboard = () => {
                                 </div>
                             ))
                         ) : (
-                            <p>No messages yet.</p>
+                            <p>No messages</p>
                         )
                     ) : (
-                        <p>Select a user to see messages.</p>
+                        <p>Select a user to start chatting</p>
                     )}
                 </div>
             </div>

@@ -8,22 +8,29 @@ const Header = ({ userName, profilePicture }) => {
 
     const handleLogout = async () => {
         const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-        if (currentUser) {
-            await axios.put(`http://localhost:5000/api/users/updateStatus/${currentUser._id}`, { status: 'Offline' }, {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem('token')}`,
-                },
-            });
+        const token = localStorage.getItem('token');
+
+        if (currentUser && token) {
+            try {
+                // Call the logout endpoint
+                await axios.post(`http://localhost:5000/api/users/logout/${currentUser._id}`, {}, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+            } catch (error) {
+                console.error('Error logging out user:', error);
+            }
         }
+
         localStorage.removeItem('token');
-        localStorage.removeItem('currentUser'); // Clear current user on logout
+        localStorage.removeItem('currentUser');
         navigate('/');
     };
 
-    // Debugging line to check the profile picture URL
     console.log('Profile Picture URL:', profilePicture);
 
-    // Assuming your server is running on localhost:5000
+    //this works
     const profilePictureUrl = profilePicture ? `http://localhost:5000/${profilePicture}` : '';
 
     return (

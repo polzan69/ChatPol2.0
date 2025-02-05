@@ -2,6 +2,12 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import MessageBox from '../components/messageBox';
+import io from 'socket.io-client';
+
+const socket = io('http://localhost:5000', {
+    transports: ['websocket'], // Use WebSocket transport
+    withCredentials: true // Include credentials
+});
 
 function Login() {
     const [email, setEmail] = useState('');
@@ -34,6 +40,9 @@ function Login() {
                     },
                 });
                 localStorage.setItem('currentUser', JSON.stringify(userResponse.data)); // Store user data
+
+                // Register the user with the WebSocket server
+                socket.emit('registerUser', response.data.user._id);
 
                 // Update user status to Online
                 await axios.put(`http://localhost:5000/api/users/updateStatus/${response.data.user._id}`, { status: 'Online' }, {
