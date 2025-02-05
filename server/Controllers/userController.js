@@ -98,11 +98,61 @@ const updateStatus = async (req, res) => {
     }
 };
 
+const editProfile = async (req, res) => {
+    const { id } = req.params;
+    const { firstName, lastName, age, email } = req.body; // Allowed fields to update
+    let profilePicturePath;
+
+    // Create an object to hold the updates
+    const updates = {};
+
+    // Only add fields that are provided in the request body
+    if (firstName) updates.firstName = firstName;
+    if (lastName) updates.lastName = lastName;
+    if (age) updates.age = age;
+    if (email) updates.email = email;
+
+    // Handle profile picture upload
+    if (req.file) {
+        const resizedImagePath = `uploads/resized-${req.file.filename}`;
+        try {
+            await sharp(req.file.path)
+                .resize(250, 250)
+                .toFile(resizedImagePath);
+
+            // Remove the original file
+            fs.unlinkSync(req.file.path);
+            profilePicturePath = resizedImagePath;
+            updates.profilePicture = profilePicturePath; // Add the profile picture path to updates
+        } catch (error) {
+            console.error('Error processing image:', error);
+            return res.status(500).json({ error: 'An error occurred while processing the image' });
+        }
+    }
+
+    try {
+        // Find the user by ID and update the allowed fields
+        const user = await User.findByIdAndUpdate(id, updates, { new: true, runValidators: true });
+        
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Exclude sensitive information before sending the response
+        const { password, socketId, status, ...userData } = user.toObject();
+        res.status(200).json(userData);
+    } catch (error) {
+        console.error('Error updating user profile:', error);
+        res.status(500).json({ error: 'An error occurred while updating the profile' });
+    }
+};
+
 module.exports = { 
     signUp, 
     login,
     logout,
     getUsers,
     getUserById,
-    updateStatus
+    updateStatus,
+    editProfile
 };

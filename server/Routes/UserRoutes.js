@@ -5,7 +5,8 @@ const { signUp,
         logout,
         getUsers,
         getUserById,
-        updateStatus
+        updateStatus,
+        editProfile
 } = require('../Controllers/userController');
 
 const authMiddleware = require('../Middlewares/authMiddleware');
@@ -20,5 +21,6 @@ router.post('/logout/:id', authMiddleware, logout);
 router.get('/get',  getUsers);
 router.get('/get/:id', authMiddleware, getUserById);
 router.put('/updateStatus/:id', authMiddleware, updateStatus);
+router.put('/editProfile/:id', authMiddleware, upload, editProfile);
 
 module.exports = router;
