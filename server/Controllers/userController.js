@@ -63,7 +63,7 @@ const logout = async (req, res) => {
 //Get existing users
 const getUsers = async (req, res) => {
     try {
-        const users = await User.find({}, 'firstName lastName email status');
+        const users = await User.find({}, 'firstName lastName email status profilePicture');
         return res.status(200).json(users);
     } catch (error) {
         console.error('Error fetching users: ', error);

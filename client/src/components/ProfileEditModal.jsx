@@ -82,33 +82,27 @@ const ProfileEditModal = ({ isOpen, onClose, user, onUpdate }) => {
                 }
             );
             
-            // Create a complete updated user object
             const updatedUser = {
                 ...user,
                 ...response.data,
-                // Ensure the profile picture URL is complete
                 profilePicture: response.data.profilePicture
             };
 
-            // Update local storage with the complete user data
             localStorage.setItem('currentUser', JSON.stringify(updatedUser));
             
-            // Update parent components with the complete user data
             onUpdate(updatedUser);
-            
-            // Reset states
             setProfilePicture(null);
             setPassword('');
             setCurrentPassword('');
             setNewPassword('');
             setShowPasswordFields(false);
-            
-            // Clean up any object URLs
+
             if (preview && preview.startsWith('blob:')) {
                 URL.revokeObjectURL(preview);
             }
             
             onClose();
+            window.location.reload();
         } catch (error) {
             console.error('Error updating profile:', error);
         }
@@ -116,7 +110,6 @@ const ProfileEditModal = ({ isOpen, onClose, user, onUpdate }) => {
 
     const handlePasswordChange = async () => {
         try {
-            // First verify the current password
             const verifyResponse = await axios.post(
                 `http://localhost:5000/api/users/verifyPassword/${user._id}`,
                 { currentPassword },
@@ -129,7 +122,6 @@ const ProfileEditModal = ({ isOpen, onClose, user, onUpdate }) => {
             );
 
             if (verifyResponse.data.verified) {
-                // If verification successful, update the password
                 const formData = new FormData();
                 formData.append('password', newPassword);
 
@@ -145,13 +137,11 @@ const ProfileEditModal = ({ isOpen, onClose, user, onUpdate }) => {
                 );
 
                 if (updateResponse.data) {
-                    // Reset password fields and close password change UI
                     setCurrentPassword('');
                     setNewPassword('');
                     setPasswordError('');
                     setShowPasswordFields(false);
                     
-                    // Update local storage and parent component
                     const currentUser = JSON.parse(localStorage.getItem('currentUser'));
                     const updatedUser = { ...currentUser, ...updateResponse.data };
                     localStorage.setItem('currentUser', JSON.stringify(updatedUser));
