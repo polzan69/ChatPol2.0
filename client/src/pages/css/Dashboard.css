@@ -6,63 +6,139 @@
 
 .dashboard-content {
     display: flex;
-    flex: 1;
+    height: calc(100vh - 60px); /* Adjust based on your header height */
 }
 
 .user-list {
-    width: 30%;
-    max-width: 450px;
-    min-width: 400px;
-    background-color: #f4f4f4;
-    padding: 10px;
-    border-right: 1px solid #ccc;
+    background: white;
+    width: 300px;
+    transition: width 0.3s ease;
+    border-right: 1px solid #eee;
     overflow-y: auto;
+}
+
+.user-list.collapsed {
+    width: 120px;
+}
+
+.user-list.collapsed .user-item {
+    justify-content: center;
+    padding: 15px 50px;
+}
+
+.user-list.collapsed .status-indicator {
+    margin-left: 5px;
+}
+
+.user-list.collapsed .user-profile-picture {
+    margin-right: 5px;
+}
+
+.user-list-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+}
+
+.toggle-sidebar-btn {
+    background: #4185b3;
+    color: white;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s ease
+}
+
+.toggle-sidebar-btn:hover {
+    background: #366d94;
 }
 
 .user-item {
     display: flex;
     align-items: center;
-    padding: 10px;
+    padding: 15px;
     cursor: pointer;
-    transition: background-color 0.3s;
-    background-color: #ffffff;
-    margin-bottom: 5px;
-    border-radius: 80px;
+    border-bottom: 1px solid #eee;
+    transition: background-color 0.2s;
+    gap: 15px;
 }
 
 .user-item:hover {
-    background-color: #e0e0e0;
-}
-
-.user-profile-picture {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    margin-right: 10px;
-    margin-left: 5px;
-    border: 2px solid black;
+    background-color: #f5f5f5;
 }
 
 .status-indicator {
-    width: 15px;
-    height: 15px;
+    width: 10px;
+    height: 10px;
     border-radius: 50%;
-    margin-right: 10px;
-    margin-left: 10px;
+    flex-shrink: 0;
 }
 
 .status-indicator.online {
-    background-color: green;
+    background-color: #4CAF50;
 }
 
 .status-indicator.offline {
-    background-color: gray;
+    background-color: #9e9e9e;
 }
 
+.user-profile-picture {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+    border: 8px double #4185b3;
+}
+
+.default-avatar {
+    background-color: #e0e0e0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: bold;
+    color: #666;
+}
+
+.user-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+    min-width: 0;
+    padding: 0 5px;
+}
+
+.user-name {
+    font-weight: 600;
+    color: #333;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 18px;
+    margin: 0;
+}
+
+.user-email {
+    font-size: 12px;
+    color: #666;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin: 0;
+}
+
+/* Ensure the chat area takes remaining space */
 .chat-area {
     flex: 1;
     padding: 20px;
-    background-color: #fff;
+    overflow-y: auto;
 }
 
 .message {

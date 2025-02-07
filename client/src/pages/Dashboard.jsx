@@ -10,6 +10,7 @@ const Dashboard = () => {
     const [messages, setMessages] = useState([]);
     const [selectedUser, setSelectedUser] = useState(null);
     const [currentUser, setCurrentUser] = useState(null);
+    const [isSidebarCollapsed, setSidebarCollapsed] = useState(false);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -83,8 +84,15 @@ const Dashboard = () => {
                 onUpdate={handleUserUpdate} 
             />
             <div className="dashboard-content">
-                <div className="user-list">
-                    <h2>Users</h2>
+                <div className={`user-list ${isSidebarCollapsed ? 'collapsed' : ''}`}>
+                    <div className="user-list-header">
+                        <button 
+                            className="toggle-sidebar-btn"
+                            onClick={() => setSidebarCollapsed(!isSidebarCollapsed)}
+                        >
+                            {isSidebarCollapsed ? '→' : '←'}
+                        </button>
+                    </div>
                     {users.map(user => (
                         <div 
                             key={user._id} 
@@ -92,12 +100,27 @@ const Dashboard = () => {
                             onClick={() => handleUserClick(user._id)}
                         >
                             <div className={`status-indicator ${user.status === 'Online' ? 'online' : 'offline'}`}></div>
-                            <img 
-                                src={user.profilePicture || ''} 
-                                alt={user.firstName} 
-                                className="user-profile-picture" 
-                            />
-                            <span>{user.firstName} {user.lastName} ({user.email})</span>
+                            {user.profilePicture ? (
+                                <img 
+                                    src={user.profilePicture}
+                                    alt={user.firstName} 
+                                    className="user-profile-picture"
+                                    onError={(e) => {
+                                        e.target.onerror = null;
+                                        e.target.src = '/default-avatar.png';
+                                    }}
+                                />
+                            ) : (
+                                <div className="user-profile-picture default-avatar">
+                                    {user.firstName?.charAt(0)}{user.lastName?.charAt(0)}
+                                </div>
+                            )}
+                            {!isSidebarCollapsed && (
+                                <div className="user-info">
+                                    <span className="user-name">{user.firstName} {user.lastName}</span>
+                                    <span className="user-email">{user.email}</span>
+                                </div>
+                            )}
                         </div>
                     ))}
                 </div>

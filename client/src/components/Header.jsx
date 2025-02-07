@@ -76,7 +76,7 @@ const Header = ({ user, onUpdate }) => {
                     className="profile-picture" 
                     onClick={() => setIsModalOpen(true)}
                 />
-                <span className="user-name">{user?.firstName} {user?.lastName}</span>
+                <span className="userName" style={{ color: 'white' }}>{user?.firstName} {user?.lastName}</span>
                 <button 
                     className="logout-button" 
                     onClick={handleLogout} 
