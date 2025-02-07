@@ -6,7 +6,8 @@ const { signUp,
         getUsers,
         getUserById,
         updateStatus,
-        editProfile
+        editProfile,
+        verifyPassword
 } = require('../Controllers/userController');
 
 const authMiddleware = require('../Middlewares/authMiddleware');
@@ -22,5 +23,6 @@ router.get('/get',  getUsers);
 router.get('/get/:id', authMiddleware, getUserById);
 router.put('/updateStatus/:id', authMiddleware, updateStatus);
 router.put('/editProfile/:id', authMiddleware, upload, editProfile);
+router.post('/verifyPassword/:id', authMiddleware, verifyPassword);
 
 module.exports = router;

@@ -23,7 +23,11 @@ const Dashboard = () => {
         const fetchUsers = async () => {
             try {
                 const response = await axios.get('http://localhost:5000/api/users/get');
-                setUsers(response.data);
+                const processedUsers = response.data.map(user => ({
+                    ...user,
+                    profilePicture: user.profilePicture ? `http://localhost:5000/${user.profilePicture}` : ''
+                }));
+                setUsers(processedUsers);
             } catch (error) {
                 console.error('Error fetching users:', error);
             }
@@ -41,7 +45,7 @@ const Dashboard = () => {
         });
 
         return () => {
-            // Do not disconnect the socket here
+            socket.off('userStatusUpdate');
         };
     }, []);
 
@@ -55,9 +59,29 @@ const Dashboard = () => {
         }
     };
 
+    const handleUserUpdate = (updatedUser) => {
+        setCurrentUser(updatedUser);
+        setUsers(prevUsers => 
+            prevUsers.map(user => 
+                user._id === updatedUser._id 
+                    ? {
+                        ...user,
+                        ...updatedUser,
+                        profilePicture: updatedUser.profilePicture 
+                            ? `http://localhost:5000/${updatedUser.profilePicture}` 
+                            : ''
+                    }
+                    : user
+            )
+        );
+    };
+
     return (
         <div className="dashboard">
-            <Header user={currentUser} onUpdate={setCurrentUser} />
+            <Header 
+                user={currentUser} 
+                onUpdate={handleUserUpdate} 
+            />
             <div className="dashboard-content">
                 <div className="user-list">
                     <h2>Users</h2>
@@ -68,7 +92,11 @@ const Dashboard = () => {
                             onClick={() => handleUserClick(user._id)}
                         >
                             <div className={`status-indicator ${user.status === 'Online' ? 'online' : 'offline'}`}></div>
-                            <img src={user.profilePicture ? `http://localhost:5000/${user.profilePicture}` : ''} alt={user.firstName} className="user-profile-picture" />
+                            <img 
+                                src={user.profilePicture || ''} 
+                                alt={user.firstName} 
+                                className="user-profile-picture" 
+                            />
                             <span>{user.firstName} {user.lastName} ({user.email})</span>
                         </div>
                     ))}

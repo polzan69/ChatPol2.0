@@ -47,16 +47,19 @@ const Header = ({ user, onUpdate }) => {
         }, 2000);
     };
 
-    const handleOpenModal = () => {
-        setIsModalOpen(true);
-    };
-
-    const handleCloseModal = () => {
-        setIsModalOpen(false);
-    };
-
     const handleUpdate = (updatedUser) => {
-        onUpdate(updatedUser);
+        // Ensure we're working with the complete user object
+        const completeUpdatedUser = {
+            ...user,
+            ...updatedUser,
+            profilePicture: updatedUser.profilePicture
+        };
+        
+        // Update the parent component
+        onUpdate(completeUpdatedUser);
+        
+        // Update local storage
+        localStorage.setItem('currentUser', JSON.stringify(completeUpdatedUser));
     };
 
     if (!user) {
@@ -68,12 +71,12 @@ const Header = ({ user, onUpdate }) => {
             <div className="header-title">ChatPol</div>
             <div className="header-user">
                 <img 
-                    src={user.profilePicture ? `http://localhost:5000/${user.profilePicture}` : ''} 
+                    src={user?.profilePicture ? `http://localhost:5000/${user.profilePicture}` : ''} 
                     alt="Profile" 
                     className="profile-picture" 
-                    onClick={handleOpenModal}
+                    onClick={() => setIsModalOpen(true)}
                 />
-                <span className="user-name">{user.firstName} {user.lastName}</span>
+                <span className="user-name">{user?.firstName} {user?.lastName}</span>
                 <button 
                     className="logout-button" 
                     onClick={handleLogout} 
@@ -84,7 +87,7 @@ const Header = ({ user, onUpdate }) => {
             </div>
             <ProfileEditModal 
                 isOpen={isModalOpen} 
-                onClose={handleCloseModal} 
+                onClose={() => setIsModalOpen(false)} 
                 user={user} 
                 onUpdate={handleUpdate} 
             />
