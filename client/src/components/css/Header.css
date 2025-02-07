@@ -8,7 +8,7 @@
     position: sticky;
     top: 0;
     z-index: 1000;
-    border-bottom: 3px solid black;
+    border: 10px double white;
 }
 
 .header-title {
@@ -36,11 +36,17 @@
     cursor: pointer;
 }
 
+.profile-picture:hover {
+    background-color: #1573b3;
+    border: 10px double white;
+}
+
 .user-name {
     margin: 0 20px 0 20px;
     font-size: 1.2rem;
     font-weight: bold;
 }
+
 
 .logout-button {
     background-color: white;

@@ -41,7 +41,6 @@ const ProfileEditModal = ({ isOpen, onClose, user, onUpdate }) => {
         }
     };
 
-    // Clean up preview URL when component unmounts or modal closes
     useEffect(() => {
         return () => {
             if (preview && preview.startsWith('blob:')) {
@@ -50,7 +49,6 @@ const ProfileEditModal = ({ isOpen, onClose, user, onUpdate }) => {
         };
     }, [preview]);
 
-    // Reset preview when modal closes
     useEffect(() => {
         if (!isOpen) {
             setPreview(user.profilePicture ? `http://localhost:5000/${user.profilePicture}` : '');
@@ -62,7 +60,6 @@ const ProfileEditModal = ({ isOpen, onClose, user, onUpdate }) => {
         e.preventDefault();
         const formData = new FormData();
         
-        // Only append values that have changed
         if (firstName !== user.firstName) formData.append('firstName', firstName);
         if (lastName !== user.lastName) formData.append('lastName', lastName);
         if (age !== user.age) formData.append('age', age);
@@ -159,10 +156,8 @@ const ProfileEditModal = ({ isOpen, onClose, user, onUpdate }) => {
     return (
         <div className="profile-modal-overlay">
             <div className="profile-modal-content">
-                <h2>Edit Profile</h2>
                 <form onSubmit={handleSubmit}>
                     <div className="profile-form-group">
-                        <label>Profile Picture:</label>
                         <div 
                             className="profile-picture-preview" 
                             onClick={handlePreviewClick}
