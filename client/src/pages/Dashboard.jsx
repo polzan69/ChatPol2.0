@@ -23,7 +23,12 @@ const Dashboard = () => {
 
         const fetchUsers = async () => {
             try {
-                const response = await axios.get('http://localhost:5000/api/friends/list');
+                const token = localStorage.getItem('token');
+                const response = await axios.get('http://localhost:5000/api/friends/list', {
+                    headers: { 
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
                 const processedUsers = response.data.map(user => ({
                     ...user,
                     profilePicture: user.profilePicture 
@@ -38,6 +43,9 @@ const Dashboard = () => {
 
         fetchUsers();
 
+        // Add event listener for friend list updates
+        window.addEventListener('friendsListUpdate', fetchUsers);
+
         socket.on('userStatusUpdate', (data) => {
             setUsers((prevUsers) => 
                 prevUsers.map((user) => 
@@ -49,6 +57,7 @@ const Dashboard = () => {
 
         return () => {
             socket.off('userStatusUpdate');
+            window.removeEventListener('friendsListUpdate', fetchUsers);
         };
     }, []);
 

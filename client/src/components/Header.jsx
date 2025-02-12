@@ -138,8 +138,15 @@ const Header = ({ user, onUpdate }) => {
                 { requestId, status },
                 { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }}
             );
+            
+            // Update requests list
             setFriendRequests(prev => prev.filter(req => req._id !== requestId));
             setNewRequestsCount(prev => prev - 1);
+            
+            // Trigger friend list refresh in Dashboard
+            if (status === 'accepted') {
+                window.dispatchEvent(new CustomEvent('friendsListUpdate'));
+            }
         } catch (error) {
             console.error('Error handling friend request:', error);
         }
