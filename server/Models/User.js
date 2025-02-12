@@ -10,6 +10,8 @@ const userSchema = new mongoose.Schema({
     profilePicture: { type: String },
     socketId: { type: String },
     status: { type: String, enum: ['Online', 'Offline'], default: 'Offline' },
+    friends: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    friendRequests: [{ type: mongoose.Schema.Types.ObjectId, ref: 'FriendRequest' }],
 });
 
 // Encrypts password before saving

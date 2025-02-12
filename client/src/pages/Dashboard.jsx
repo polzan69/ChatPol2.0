@@ -23,14 +23,16 @@ const Dashboard = () => {
 
         const fetchUsers = async () => {
             try {
-                const response = await axios.get('http://localhost:5000/api/users/get');
+                const response = await axios.get('http://localhost:5000/api/friends/list');
                 const processedUsers = response.data.map(user => ({
                     ...user,
-                    profilePicture: user.profilePicture ? `http://localhost:5000/${user.profilePicture}` : ''
+                    profilePicture: user.profilePicture 
+                        ? `http://localhost:5000/${user.profilePicture}` 
+                        : ''
                 }));
                 setUsers(processedUsers);
             } catch (error) {
-                console.error('Error fetching users:', error);
+                console.error('Error fetching friends:', error);
             }
         };
 

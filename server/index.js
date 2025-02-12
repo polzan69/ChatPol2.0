@@ -10,6 +10,7 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server); 
 const userRoutes = require('./Routes/UserRoutes');
+const friendRoutes = require('./Routes/FriendRoutes');
 
 const PORT = process.env.PORT || 5000;
 
@@ -74,6 +75,7 @@ io.on('connection', (socket) => {
 
 // Routes
 app.use('/api/users', userRoutes);
+app.use('/api/friends', friendRoutes);
 
 server.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
