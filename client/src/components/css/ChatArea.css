@@ -38,14 +38,12 @@
 }
 
 .message.sent {
-    align-self: flex-end;
     background-color: #4185b3;
     color: white;
     border: 5px double white;
 }
 
 .message.received {
-    align-self: flex-start;
     background-color: white;
     color: #333;
     border: 5px double #4185b3;
@@ -134,10 +132,13 @@
     align-items: flex-start;
     gap: 10px;
     position: relative;
+    width: 100%;
+    justify-content: flex-start;
 }
 
 .message-container.sent {
     flex-direction: row-reverse;
+    justify-content: flex-start;
 }
 
 .message-avatar {
