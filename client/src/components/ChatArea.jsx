@@ -16,21 +16,26 @@ const ChatArea = ({ selectedUser, currentUser }) => {
         if (selectedUser && currentUser?._id) {
             fetchMessages();
             
+            // Join user's room
+            socket.emit('joinRoom', currentUser._id);
+            
             // Listen for new messages
-            socket.on('newMessage', (message) => {
-                // Check if message is from current chat
+            const handleNewMessage = (message) => {
+                console.log('Received message:', message);
                 if (
                     (message.sender._id === selectedUser && message.receiver._id === currentUser._id) ||
                     (message.sender._id === currentUser._id && message.receiver._id === selectedUser)
                 ) {
                     setMessages(prev => [...prev, message]);
                 }
-            });
-        }
+            };
 
-        return () => {
-            socket.off('newMessage');
-        };
+            socket.on('newMessage', handleNewMessage);
+
+            return () => {
+                socket.off('newMessage', handleNewMessage);
+            };
+        }
     }, [selectedUser, currentUser]);
 
     useEffect(() => {
@@ -69,8 +74,7 @@ const ChatArea = ({ selectedUser, currentUser }) => {
                 }
             );
 
-            // Update messages locally immediately
-            setMessages(prev => [...prev, response.data]);
+            socket.emit('sendMessage', response.data);
             setNewMessage('');
         } catch (error) {
             console.error('Error sending message:', error);

@@ -36,11 +36,18 @@ app.use('/uploads', express.static('uploads'));
 io.on('connection', (socket) => {
     console.log('New client connected:', socket.id);
 
+    socket.on('joinRoom', (userId) => {
+        socket.join(userId.toString());
+        console.log(`User ${userId} joined room ${userId}`);
+    });
+
     socket.on('registerUser', async (userId) => {
-        const user = await User.findByIdAndUpdate(userId, { socketId: socket.id, status: 'Online' }, { new: true });
-        console.log(`User ${userId} is now Online`, user);
-        
-        // Emit an event to all clients to update the user status
+        const user = await User.findByIdAndUpdate(
+            userId, 
+            { socketId: socket.id, status: 'Online' }, 
+            { new: true }
+        );
+        socket.join(userId.toString());
         io.emit('userStatusUpdate', { userId, status: 'Online' });
     });
 
@@ -53,21 +60,11 @@ io.on('connection', (socket) => {
         console.log(`User ${userId} has logged out`);
     });
 
-    // Updated sendMessage socket handler
     socket.on('sendMessage', async (data) => {
         try {
-            const { sender, receiver, content } = data;
-
-            // Save the message to the database
-            const message = new Message({ sender, receiver, content });
-            await message.save();
-
-            const populatedMessage = await Message.findById(message._id)
-                .populate('sender', 'firstName lastName profilePicture')
-                .populate('receiver', 'firstName lastName profilePicture');
-
-            // Emit the message to the receiver
-            socket.to(receiver.toString()).emit('newMessage', populatedMessage);
+            console.log('Broadcasting message to rooms:', data.sender._id, data.receiver._id);
+            // Broadcast to both rooms
+            io.to(data.receiver._id.toString()).to(data.sender._id.toString()).emit('newMessage', data);
         } catch (error) {
             console.error('Error handling socket message:', error);
         }
