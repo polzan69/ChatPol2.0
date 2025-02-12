@@ -7,6 +7,8 @@ const ChatArea = ({ selectedUser, currentUser }) => {
     const [messages, setMessages] = useState([]);
     const [newMessage, setNewMessage] = useState('');
     const messagesEndRef = useRef(null);
+    const [selectedUserData, setSelectedUserData] = useState(null);
+    const [showTimestamp, setShowTimestamp] = useState(null);
     
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -42,6 +44,12 @@ const ChatArea = ({ selectedUser, currentUser }) => {
         scrollToBottom();
     }, [messages]);
 
+    useEffect(() => {
+        if (selectedUser) {
+            fetchSelectedUserData();
+        }
+    }, [selectedUser]);
+
     const fetchMessages = async () => {
         try {
             const token = localStorage.getItem('token');
@@ -54,6 +62,21 @@ const ChatArea = ({ selectedUser, currentUser }) => {
             setMessages(response.data);
         } catch (error) {
             console.error('Error fetching messages:', error);
+        }
+    };
+
+    const fetchSelectedUserData = async () => {
+        try {
+            const token = localStorage.getItem('token');
+            const response = await axios.get(
+                `http://localhost:5000/api/users/get/${selectedUser}`,
+                {
+                    headers: { Authorization: `Bearer ${token}` }
+                }
+            );
+            setSelectedUserData(response.data);
+        } catch (error) {
+            console.error('Error fetching user data:', error);
         }
     };
 
@@ -81,6 +104,10 @@ const ChatArea = ({ selectedUser, currentUser }) => {
         }
     };
 
+    const handleMessageClick = (messageId) => {
+        setShowTimestamp(showTimestamp === messageId ? null : messageId);
+    };
+
     if (!selectedUser) {
         return (
             <div className="chat-area empty-chat">
@@ -96,6 +123,13 @@ const ChatArea = ({ selectedUser, currentUser }) => {
             <div className="chat-messages">
                 {messages.map((message) => {
                     const isSentByCurrentUser = message.sender._id === currentUser._id;
+                    const userProfilePic = isSentByCurrentUser 
+                        ? currentUser.profilePicture 
+                        : selectedUserData?.profilePicture;
+                    const userName = isSentByCurrentUser
+                        ? currentUser
+                        : selectedUserData;
+
                     return (
                         <div
                             key={message._id}
@@ -103,20 +137,23 @@ const ChatArea = ({ selectedUser, currentUser }) => {
                         >
                             {!isSentByCurrentUser && (
                                 <div className="message-avatar">
-                                    {message.sender.profilePicture ? (
+                                    {userProfilePic ? (
                                         <img 
-                                            src={`http://localhost:5000/${message.sender.profilePicture}`}
-                                            alt={`${message.sender.firstName}'s avatar`}
+                                            src={`http://localhost:5000/${userProfilePic}`}
+                                            alt={`${userName?.firstName}'s avatar`}
                                         />
                                     ) : (
                                         <div className="default-avatar">
-                                            {message.sender.firstName?.charAt(0)}
-                                            {message.sender.lastName?.charAt(0)}
+                                            {userName?.firstName?.charAt(0)}
+                                            {userName?.lastName?.charAt(0)}
                                         </div>
                                     )}
                                 </div>
                             )}
-                            <div className={`message ${isSentByCurrentUser ? 'sent' : 'received'}`}>
+                            <div 
+                                className={`message ${isSentByCurrentUser ? 'sent' : 'received'} ${showTimestamp === message._id ? 'show-timestamp' : ''}`}
+                                onClick={() => handleMessageClick(message._id)}
+                            >
                                 <div className="message-content">
                                     {message.content}
                                 </div>
@@ -126,15 +163,15 @@ const ChatArea = ({ selectedUser, currentUser }) => {
                             </div>
                             {isSentByCurrentUser && (
                                 <div className="message-avatar">
-                                    {currentUser.profilePicture ? (
+                                    {userProfilePic ? (
                                         <img 
-                                            src={`http://localhost:5000/${currentUser.profilePicture}`}
+                                            src={`http://localhost:5000/${userProfilePic}`}
                                             alt="Your avatar"
                                         />
                                     ) : (
                                         <div className="default-avatar">
-                                            {currentUser.firstName?.charAt(0)}
-                                            {currentUser.lastName?.charAt(0)}
+                                            {userName?.firstName?.charAt(0)}
+                                            {userName?.lastName?.charAt(0)}
                                         </div>
                                     )}
                                 </div>
