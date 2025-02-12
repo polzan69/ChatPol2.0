@@ -3,14 +3,17 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const http = require('http');
 const socketIo = require('socket.io');
-require('dotenv').config();
 
 const User = require('./Models/User');
+const Message = require('./Models/Message');
+require('dotenv').config();
+
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server); 
 const userRoutes = require('./Routes/UserRoutes');
 const friendRoutes = require('./Routes/FriendRoutes');
+const messageRoutes = require('./Routes/MessageRoutes');
 
 const PORT = process.env.PORT || 5000;
 
@@ -50,16 +53,24 @@ io.on('connection', (socket) => {
         console.log(`User ${userId} has logged out`);
     });
 
-    // Listen for incoming messages
+    // Updated sendMessage socket handler
     socket.on('sendMessage', async (data) => {
-        const { sender, receiver, content } = data;
+        try {
+            const { sender, receiver, content } = data;
 
-        // Save the message to the database
-        const message = new Message({ sender, receiver, content });
-        await message.save();
+            // Save the message to the database
+            const message = new Message({ sender, receiver, content });
+            await message.save();
 
-        // Emit the message to the receiver
-        socket.to(receiver).emit('receiveMessage', message);
+            const populatedMessage = await Message.findById(message._id)
+                .populate('sender', 'firstName lastName profilePicture')
+                .populate('receiver', 'firstName lastName profilePicture');
+
+            // Emit the message to the receiver
+            socket.to(receiver.toString()).emit('newMessage', populatedMessage);
+        } catch (error) {
+            console.error('Error handling socket message:', error);
+        }
     });
 
     socket.on('disconnect', async () => {
@@ -76,6 +87,7 @@ io.on('connection', (socket) => {
 // Routes
 app.use('/api/users', userRoutes);
 app.use('/api/friends', friendRoutes);
+app.use('/api/messages', messageRoutes);
 
 server.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);

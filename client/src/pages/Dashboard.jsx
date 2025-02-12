@@ -4,6 +4,7 @@ import axios from 'axios';
 import './css/Dashboard.css';
 import socket from '../socket'; // Import the centralized socket
 import { useNavigate } from 'react-router-dom';
+import ChatArea from '../components/ChatArea';
 
 const Dashboard = () => {
     const [users, setUsers] = useState([]);
@@ -64,7 +65,13 @@ const Dashboard = () => {
     const handleUserClick = async (userId) => {
         setSelectedUser(userId);
         try {
-            const response = await axios.get(`http://localhost:5000/api/messages/${userId}`);
+            const token = localStorage.getItem('token');
+            const response = await axios.get(
+                `http://localhost:5000/api/messages/${userId}`,
+                {
+                    headers: { Authorization: `Bearer ${token}` }
+                }
+            );
             setMessages(response.data);
         } catch (error) {
             console.error('Error fetching messages:', error);
@@ -135,22 +142,10 @@ const Dashboard = () => {
                         </div>
                     ))}
                 </div>
-                <div className="chat-area">
-                    <h2>Chat</h2>
-                    {selectedUser ? (
-                        messages.length > 0 ? (
-                            messages.map(message => (
-                                <div key={message._id} className="message">
-                                    <strong>{message.sender}</strong>: {message.content}
-                                </div>
-                            ))
-                        ) : (
-                            <p>No messages</p>
-                        )
-                    ) : (
-                        <p>Select a user to start chatting</p>
-                    )}
-                </div>
+                <ChatArea 
+                    selectedUser={selectedUser} 
+                    currentUser={currentUser}
+                />
             </div>
         </div>
     );
