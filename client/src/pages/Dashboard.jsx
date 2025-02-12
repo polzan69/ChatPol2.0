@@ -142,10 +142,12 @@ const Dashboard = () => {
                         </div>
                     ))}
                 </div>
-                <ChatArea 
-                    selectedUser={selectedUser} 
-                    currentUser={currentUser}
-                />
+                {currentUser && (
+                    <ChatArea 
+                        selectedUser={selectedUser} 
+                        currentUser={currentUser}
+                    />
+                )}
             </div>
         </div>
     );

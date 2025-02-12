@@ -13,12 +13,16 @@ const ChatArea = ({ selectedUser, currentUser }) => {
     };
 
     useEffect(() => {
-        if (selectedUser) {
+        if (selectedUser && currentUser?._id) {
             fetchMessages();
             
             // Listen for new messages
             socket.on('newMessage', (message) => {
-                if (message.sender._id === selectedUser || message.receiver._id === selectedUser) {
+                // Check if message is from current chat
+                if (
+                    (message.sender._id === selectedUser && message.receiver._id === currentUser._id) ||
+                    (message.sender._id === currentUser._id && message.receiver._id === selectedUser)
+                ) {
                     setMessages(prev => [...prev, message]);
                 }
             });
@@ -27,7 +31,7 @@ const ChatArea = ({ selectedUser, currentUser }) => {
         return () => {
             socket.off('newMessage');
         };
-    }, [selectedUser]);
+    }, [selectedUser, currentUser]);
 
     useEffect(() => {
         scrollToBottom();
@@ -65,12 +69,9 @@ const ChatArea = ({ selectedUser, currentUser }) => {
                 }
             );
 
-            // Add the new message immediately with the response data
+            // Update messages locally immediately
             setMessages(prev => [...prev, response.data]);
             setNewMessage('');
-            
-            // Emit through socket after successful save
-            socket.emit('sendMessage', response.data);
         } catch (error) {
             console.error('Error sending message:', error);
         }

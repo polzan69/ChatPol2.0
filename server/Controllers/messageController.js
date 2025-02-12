@@ -38,8 +38,10 @@ const sendMessage = async (req, res) => {
             .populate('sender', 'firstName lastName profilePicture')
             .populate('receiver', 'firstName lastName profilePicture');
 
+        // Emit to both sender and receiver
         if (req.io) {
             req.io.to(receiverId.toString()).emit('newMessage', populatedMessage);
+            req.io.to(senderId.toString()).emit('newMessage', populatedMessage);
         }
 
         res.status(201).json(populatedMessage);
