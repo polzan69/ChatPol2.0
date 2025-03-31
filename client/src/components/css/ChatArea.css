@@ -165,3 +165,54 @@
     justify-content: center;
     font-weight: bold;
 }
+
+/* Improve chat area for mobile */
+@media screen and (max-width: 576px) {
+  .chat-area {
+    margin: 5px;
+    height: calc(100vh - 120px);
+  }
+  
+  .chat-messages {
+    padding: 10px;
+  }
+  
+  .message {
+    max-width: 85%;
+    padding: 8px 12px;
+    border-width: 3px;
+  }
+  
+  .message-avatar {
+    width: 30px;
+    height: 30px;
+  }
+  
+  .chat-input-form {
+    padding: 8px 5px;
+    gap: 5px;
+  }
+  
+  .chat-input {
+    padding: 8px 10px;
+    border-width: 3px;
+    font-size: 16px;
+  }
+  
+  .send-button {
+    padding: 8px 12px;
+    border-width: 3px;
+    font-size: 14px;
+  }
+  
+  .message {
+    max-width: 80%;
+    padding: 8px 12px;
+    border-width: 3px;
+    margin: 3px 0;
+  }
+  
+  .message-container {
+    margin-bottom: 5px;
+  }
+}

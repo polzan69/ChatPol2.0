@@ -67,3 +67,23 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+@media (max-width: 576px) {
+  button, 
+  input[type="submit"],
+  .user-item,
+  .message,
+  .profile-picture,
+  .send-button {
+    cursor: default; /* Better for touch */
+  }
+  
+  input, textarea {
+    font-size: 16px; /* Prevents iOS zoom on focus */
+  }
+  
+  /* Improve tap targets */
+  button, .user-item {
+    min-height: 44px;
+  }
+}

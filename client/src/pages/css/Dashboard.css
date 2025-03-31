@@ -147,3 +147,97 @@
     border: 1px solid #ccc;
     border-radius: 5px;
 }
+
+/* Remove mobile toggle button styles and add swipe indicator */
+@media screen and (max-width: 576px) {
+  .dashboard-content {
+    position: relative;
+    overflow-x: hidden; /* Prevent horizontal scrolling */
+  }
+  
+  /* Remove the mobile-toggle-btn styles since we won't need it */
+  
+  /* Improve user list positioning and visibility */
+  .user-list {
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 80%;
+    max-width: 300px;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    z-index: 1000;
+    background: white;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+  }
+  
+  .user-list.visible {
+    transform: translateX(0);
+  }
+  
+  /* Add swipe indicator */
+  .swipe-indicator {
+    position: fixed;
+    left: 0;
+    top: 50%;
+    width: 5px;
+    height: 100px;
+    background-color: rgba(65, 133, 179, 0.3);
+    border-radius: 0 3px 3px 0;
+    transform: translateY(-50%);
+    z-index: 998;
+    transition: opacity 0.3s ease;
+  }
+  
+  .swipe-indicator.active {
+    background-color: rgba(65, 133, 179, 0.6);
+  }
+  
+  /* Ensure content doesn't overlap with fixed header */
+  .dashboard-content {
+    padding-top: 5px;
+  }
+  
+  /* User list header adjustments */
+  .user-list-header {
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .user-list-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: #4185b3;
+  }
+  
+  .close-sidebar-btn {
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #4185b3;
+    cursor: pointer;
+    padding: 5px;
+  }
+}
+
+/* Sidebar overlay */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+}
+
+@media screen and (max-width: 576px) {
+  .sidebar-overlay.visible {
+    display: block;
+  }
+}

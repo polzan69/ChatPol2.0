@@ -20,6 +20,7 @@ const Header = ({ user, onUpdate }) => {
     const [userFriends, setUserFriends] = useState([]);
     const [pendingRequests, setPendingRequests] = useState([]);
     const searchContainerRef = useRef(null);
+    const [isMobile, setIsMobile] = useState(window.innerWidth <= 576);
 
     useEffect(() => {
         socket.on('connect', () => {
@@ -104,6 +105,15 @@ const Header = ({ user, onUpdate }) => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
     }, [showDropdown]);
+
+    useEffect(() => {
+        const handleResize = () => {
+            setIsMobile(window.innerWidth <= 576);
+        };
+        
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     const handleLogout = async () => {
         const currentUser = JSON.parse(localStorage.getItem('currentUser'));
@@ -220,6 +230,38 @@ const Header = ({ user, onUpdate }) => {
     return (
         <header className="header">
             <div className="header-title">ChatPol</div>
+            
+            <div className="header-user">
+                {!isMobile && <div className="notifications">
+                    <button className="notifications-btn" onClick={() => setShowRequests(true)}>
+                        🔔
+                        {newRequestsCount > 0 && (
+                            <span className="notification-badge">{newRequestsCount}</span>
+                        )}
+                    </button>
+                </div>}
+                
+                {user?.profilePicture ? (
+                    <img 
+                        src={user.profilePicture} 
+                        alt="Profile" 
+                        className="profile-picture"
+                        onClick={() => setIsModalOpen(true)}
+                    />
+                ) : (
+                    <div 
+                        className="profile-picture" 
+                        onClick={() => setIsModalOpen(true)}
+                        style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                    >
+                        {user?.firstName?.charAt(0)}{user?.lastName?.charAt(0)}
+                    </div>
+                )}
+                
+                {!isMobile && <span className="userName">{user?.firstName} {user?.lastName}</span>}
+                <button className="logout-button" onClick={handleLogout}>Logout</button>
+            </div>
+            
             <div className="search-container" ref={searchContainerRef}>
                 <input
                     type="text"
@@ -238,33 +280,16 @@ const Header = ({ user, onUpdate }) => {
                     />
                 )}
             </div>
-            <div className="header-user">
-                <div className="notifications">
-                    <button 
-                        className="notifications-btn"
-                        onClick={() => setShowRequests(true)}
-                    >
-                        {newRequestsCount > 0 && (
-                            <span className="notification-badge">{newRequestsCount}</span>
-                        )}
-                        🔔
-                    </button>
-                </div>
-                <img 
-                    src={user?.profilePicture ? `http://localhost:5000/${user.profilePicture}` : ''} 
-                    alt="Profile" 
-                    className="profile-picture" 
-                    onClick={() => setIsModalOpen(true)}
-                />
-                <span className="userName" style={{ color: 'white' }}>{user?.firstName} {user?.lastName}</span>
-                <button 
-                    className="logout-button" 
-                    onClick={handleLogout} 
-                    disabled={isLoggingOut}
-                >
-                    {isLoggingOut ? 'Logging out...' : 'Logout'}
+            
+            {isMobile && <div className="notifications mobile-notifications">
+                <button className="notifications-btn" onClick={() => setShowRequests(true)}>
+                    🔔
+                    {newRequestsCount > 0 && (
+                        <span className="notification-badge">{newRequestsCount}</span>
+                    )}
                 </button>
-            </div>
+            </div>}
+            
             <ProfileEditModal 
                 isOpen={isModalOpen} 
                 onClose={() => setIsModalOpen(false)} 

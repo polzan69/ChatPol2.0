@@ -9,6 +9,7 @@ const ChatArea = ({ selectedUser, currentUser }) => {
     const messagesEndRef = useRef(null);
     const [selectedUserData, setSelectedUserData] = useState(null);
     const [showTimestamp, setShowTimestamp] = useState(null);
+    const [isMobile, setIsMobile] = useState(window.innerWidth <= 576);
     
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -49,6 +50,15 @@ const ChatArea = ({ selectedUser, currentUser }) => {
             fetchSelectedUserData();
         }
     }, [selectedUser]);
+
+    useEffect(() => {
+        const handleResize = () => {
+            setIsMobile(window.innerWidth <= 576);
+        };
+        
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     const fetchMessages = async () => {
         try {
@@ -135,7 +145,7 @@ const ChatArea = ({ selectedUser, currentUser }) => {
                             key={message._id}
                             className={`message-container ${isSentByCurrentUser ? 'sent' : 'received'}`}
                         >
-                            {!isSentByCurrentUser && (
+                            {!isMobile && !isSentByCurrentUser && (
                                 <div className="message-avatar">
                                     {userProfilePic ? (
                                         <img 
@@ -161,7 +171,7 @@ const ChatArea = ({ selectedUser, currentUser }) => {
                                     {new Date(message.timestamp).toLocaleTimeString()}
                                 </div>
                             </div>
-                            {isSentByCurrentUser && (
+                            {!isMobile && isSentByCurrentUser && (
                                 <div className="message-avatar">
                                     {userProfilePic ? (
                                         <img 
