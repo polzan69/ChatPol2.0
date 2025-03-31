@@ -7,7 +7,8 @@ const {
     sendFriendRequest,
     handleFriendRequest,
     getFriendRequests,
-    getFriends
+    getFriends,
+    getSentFriendRequests
 } = require('../Controllers/friendController');
 
 router.get('/search', auth, searchUsers);
@@ -15,5 +16,6 @@ router.post('/request', auth, sendFriendRequest);
 router.put('/request/handle', auth, handleFriendRequest);
 router.get('/requests', auth, getFriendRequests);
 router.get('/list', auth, getFriends);
+router.get('/sent-requests', auth, getSentFriendRequests);
 
 module.exports = router;

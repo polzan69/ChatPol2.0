@@ -329,3 +329,25 @@
         display: none; /* Hide email on small screens */
     }
 }
+
+.already-friend-label {
+    background-color: #e0e0e0;
+    color: #666;
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-size: 14px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    border: 5px double #4185b3;
+}
+
+.pending-request-label {
+    background-color: #ffd54f;
+    color: #5d4037;
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-size: 14px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    border: 5px double #4185b3;
+}

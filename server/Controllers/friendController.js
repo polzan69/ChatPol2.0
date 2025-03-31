@@ -105,10 +105,25 @@ const getFriends = async (req, res) => {
     }
 };
 
+// Get sent friend requests
+const getSentFriendRequests = async (req, res) => {
+    try {
+        const requests = await FriendRequest.find({
+            sender: req.user._id,
+            status: 'pending'
+        }).populate('receiver', 'firstName lastName email profilePicture');
+        
+        res.status(200).json(requests);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
 module.exports = {
     searchUsers,
     sendFriendRequest,
     handleFriendRequest,
     getFriendRequests,
-    getFriends
+    getFriends,
+    getSentFriendRequests
 };

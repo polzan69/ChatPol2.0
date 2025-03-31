@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import ProfileEditModal from './ProfileEditModal';
@@ -17,6 +17,9 @@ const Header = ({ user, onUpdate }) => {
     const [showRequests, setShowRequests] = useState(false);
     const [friendRequests, setFriendRequests] = useState([]);
     const [newRequestsCount, setNewRequestsCount] = useState(0);
+    const [userFriends, setUserFriends] = useState([]);
+    const [pendingRequests, setPendingRequests] = useState([]);
+    const searchContainerRef = useRef(null);
 
     useEffect(() => {
         socket.on('connect', () => {
@@ -43,6 +46,64 @@ const Header = ({ user, onUpdate }) => {
             clearInterval(interval);
         };
     }, []);
+
+    useEffect(() => {
+        const fetchFriends = async () => {
+            try {
+                const response = await axios.get('http://localhost:5000/api/friends/list', {
+                    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+                });
+                setUserFriends(response.data);
+            } catch (error) {
+                console.error('Error fetching friends list:', error);
+            }
+        };
+
+        fetchFriends();
+        
+        // Listen for friend list updates
+        window.addEventListener('friendsListUpdate', fetchFriends);
+        
+        return () => {
+            window.removeEventListener('friendsListUpdate', fetchFriends);
+        };
+    }, []);
+
+    useEffect(() => {
+        const fetchPendingRequests = async () => {
+            try {
+                // Get sent requests that are pending
+                const response = await axios.get('http://localhost:5000/api/friends/sent-requests', {
+                    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+                });
+                setPendingRequests(response.data);
+            } catch (error) {
+                console.error('Error fetching pending requests:', error);
+            }
+        };
+
+        fetchPendingRequests();
+        const interval = setInterval(fetchPendingRequests, 30000);
+        
+        return () => clearInterval(interval);
+    }, []);
+
+    useEffect(() => {
+        function handleClickOutside(event) {
+            if (searchContainerRef.current && !searchContainerRef.current.contains(event.target)) {
+                setShowDropdown(false);
+                setSearchQuery('');
+            }
+        }
+        
+        if (showDropdown) {
+            document.addEventListener('mousedown', handleClickOutside);
+        }
+        
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [showDropdown]);
 
     const handleLogout = async () => {
         const currentUser = JSON.parse(localStorage.getItem('currentUser'));
@@ -159,7 +220,7 @@ const Header = ({ user, onUpdate }) => {
     return (
         <header className="header">
             <div className="header-title">ChatPol</div>
-            <div className="search-container">
+            <div className="search-container" ref={searchContainerRef}>
                 <input
                     type="text"
                     placeholder="Search users..."
@@ -172,6 +233,8 @@ const Header = ({ user, onUpdate }) => {
                         users={searchResults}
                         onSendRequest={handleSendRequest}
                         onClose={() => setShowDropdown(false)}
+                        currentUserFriends={userFriends}
+                        pendingRequests={pendingRequests}
                     />
                 )}
             </div>
