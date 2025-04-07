@@ -1,16 +1,10 @@
 const multer = require('multer');
 const path = require('path');
+const axios = require('axios');
+const FormData = require('form-data');
 
-// Set up storage for multer
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, 'uploads/');
-    },
-    filename: (req, file, cb) => {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        cb(null, uniqueSuffix + path.extname(file.originalname));
-    }
-});
+// Configure multer to store files in memory
+const storage = multer.memoryStorage();
 
 // Filter for image files
 const fileFilter = (req, file, cb) => {
@@ -32,4 +26,33 @@ const upload = multer({
     fileFilter: fileFilter
 }).single('profilePicture');
 
-module.exports = upload;
+// Wrapper function to handle ImgBB upload
+const uploadToImgBB = async (req, res, next) => {
+    upload(req, res, async (err) => {
+        if (err) {
+            return next(err);
+        }
+
+        if (!req.file) {
+            return next();
+        }
+
+        try {
+            const formData = new FormData();
+            formData.append('image', req.file.buffer.toString('base64'));
+            formData.append('key', '2fd6dd451112e14b78d9795bed49504d');
+
+            const response = await axios.post('https://api.imgbb.com/1/upload', formData, {
+                headers: formData.getHeaders()
+            });
+
+            // Store the ImgBB URL in the request object
+            req.file.path = response.data.data.url;
+            next();
+        } catch (error) {
+            next(error);
+        }
+    });
+};
+
+module.exports = uploadToImgBB;

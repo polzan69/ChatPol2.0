@@ -10,7 +10,7 @@ const FriendRequestsModal = ({ isOpen, onClose, requests, onAccept, onReject }) 
                         <div key={request._id} className="friend-request-item">
                             <div className="requester-info">
                                 <img 
-                                    src={request.sender.profilePicture ? `http://localhost:5000/${request.sender.profilePicture}` : '/default-avatar.png'} 
+                                    src={request.sender.profilePicture || '/default-avatar.png'} 
                                     alt={request.sender.firstName} 
                                     className="requester-pic"
                                 />

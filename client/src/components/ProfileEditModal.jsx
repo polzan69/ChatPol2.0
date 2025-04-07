@@ -9,7 +9,7 @@ const ProfileEditModal = ({ isOpen, onClose, user, onUpdate }) => {
     const [email, setEmail] = useState(user.email);
     const [password, setPassword] = useState('');
     const [profilePicture, setProfilePicture] = useState(null);
-    const [preview, setPreview] = useState(user.profilePicture ? `http://localhost:5000/${user.profilePicture}` : '');
+    const [preview, setPreview] = useState(user.profilePicture || '');
 
     const [showPasswordFields, setShowPasswordFields] = useState(false);
     const [currentPassword, setCurrentPassword] = useState('');
@@ -24,7 +24,7 @@ const ProfileEditModal = ({ isOpen, onClose, user, onUpdate }) => {
             setLastName(user.lastName);
             setAge(user.age);
             setEmail(user.email);
-            setPreview(user.profilePicture ? `http://localhost:5000/${user.profilePicture}` : '');
+            setPreview(user.profilePicture || '');
         }
     }, [user]);
 
@@ -51,7 +51,7 @@ const ProfileEditModal = ({ isOpen, onClose, user, onUpdate }) => {
 
     useEffect(() => {
         if (!isOpen) {
-            setPreview(user.profilePicture ? `http://localhost:5000/${user.profilePicture}` : '');
+            setPreview(user.profilePicture || '');
             setProfilePicture(null);
         }
     }, [isOpen, user.profilePicture]);

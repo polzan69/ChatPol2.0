@@ -9,20 +9,10 @@ const path = require('path');
 // Sign up function
 const signUp = async (req, res) => {
     const { firstName, lastName, age, email, password } = req.body;
-    let profilePicturePath = req.file ? req.file.path : null;
+    let profilePicture = req.file ? req.file.path : null;
 
     try {
-        if (profilePicturePath) {
-            const resizedImagePath = `uploads/resized-${req.file.filename}`;
-            await sharp(profilePicturePath)
-                .resize(250, 250)
-                .toFile(resizedImagePath);
-
-            fs.unlinkSync(profilePicturePath);
-            profilePicturePath = resizedImagePath;
-        }
-
-        const newUser = new User({ firstName, lastName, age, email, password, profilePicture: profilePicturePath });
+        const newUser = new User({ firstName, lastName, age, email, password, profilePicture });
         await newUser.save();
         res.status(201).json({ message: 'User created successfully' });
     } catch (error) {
@@ -139,21 +129,7 @@ const editProfile = async (req, res) => {
 
         // Handle profile picture upload
         if (req.file) {
-            // Generate a fixed filename based on user ID
-            const fileExtension = path.extname(req.file.originalname);
-            const resizedImagePath = `uploads/profile-${id}${fileExtension}`;
-            
-            try {
-                // Create or replace the resized image
-                await sharp(req.file.path)
-                    .resize(250, 250)
-                    .toFile(resizedImagePath);
-
-                updates.profilePicture = resizedImagePath;
-            } catch (error) {
-                console.error('Error processing image:', error);
-                return res.status(500).json({ error: 'Error processing image' });
-            }
+            updates.profilePicture = req.file.path;
         }
 
         // Update user with new information

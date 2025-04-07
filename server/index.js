@@ -30,8 +30,6 @@ mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTop
     .then(() => console.log('MongoDB connected'))
     .catch(err => console.error(err));
 
-app.use('/uploads', express.static('uploads')); 
-
 //Test WebSocket connection
 io.on('connection', (socket) => {
     console.log('New client connected:', socket.id);

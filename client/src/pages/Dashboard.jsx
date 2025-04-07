@@ -52,13 +52,7 @@ const Dashboard = () => {
                         'Authorization': `Bearer ${token}`
                     }
                 });
-                const processedUsers = response.data.map(user => ({
-                    ...user,
-                    profilePicture: user.profilePicture 
-                        ? `http://localhost:5000/${user.profilePicture}` 
-                        : ''
-                }));
-                setUsers(processedUsers);
+                setUsers(response.data);
             } catch (error) {
                 console.error('Error fetching friends:', error);
             }

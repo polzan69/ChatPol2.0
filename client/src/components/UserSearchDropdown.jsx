@@ -14,7 +14,7 @@ const UserSearchDropdown = ({ users, onSendRequest, onClose, currentUserFriends,
                     return (
                         <div key={user._id} className="search-result-item">
                             <img 
-                                src={user.profilePicture ? `http://localhost:5000/${user.profilePicture}` : '/default-avatar.png'} 
+                                src={user.profilePicture || '/default-avatar.png'} 
                                 alt={user.firstName} 
                                 className="search-profile-pic"
                             />

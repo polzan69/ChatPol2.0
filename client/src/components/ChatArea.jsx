@@ -149,7 +149,7 @@ const ChatArea = ({ selectedUser, currentUser }) => {
                                 <div className="message-avatar">
                                     {userProfilePic ? (
                                         <img 
-                                            src={`http://localhost:5000/${userProfilePic}`}
+                                            src={userProfilePic}
                                             alt={`${userName?.firstName}'s avatar`}
                                         />
                                     ) : (
@@ -175,7 +175,7 @@ const ChatArea = ({ selectedUser, currentUser }) => {
                                 <div className="message-avatar">
                                     {userProfilePic ? (
                                         <img 
-                                            src={`http://localhost:5000/${userProfilePic}`}
+                                            src={userProfilePic}
                                             alt="Your avatar"
                                         />
                                     ) : (
