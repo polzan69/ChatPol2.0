@@ -13,7 +13,20 @@ const messageSchema = new mongoose.Schema({
     },
     content: {
         type: String,
-        required: true,
+        required: function() {
+            return !this.imageUrl; // Content is required if there's no imageUrl
+        },
+    },
+    imageUrl: {
+        type: String,
+        required: function() {
+            return !this.content; // imageUrl is required if there's no content
+        },
+    },
+    messageType: {
+        type: String,
+        enum: ['text', 'image'],
+        default: 'text',
     },
     timestamp: {
         type: Date,

@@ -2,14 +2,19 @@ import React, { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 import './css/ChatArea.css';
 import socket from '../socket';
+import ImageModal from './ImageModal';
 
 const ChatArea = ({ selectedUser, currentUser }) => {
     const [messages, setMessages] = useState([]);
     const [newMessage, setNewMessage] = useState('');
+    const [selectedImage, setSelectedImage] = useState(null);
+    const [isImageModalOpen, setIsImageModalOpen] = useState(false);
+    const [selectedImageUrl, setSelectedImageUrl] = useState('');
     const messagesEndRef = useRef(null);
     const [selectedUserData, setSelectedUserData] = useState(null);
     const [showTimestamp, setShowTimestamp] = useState(null);
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 576);
+    const fileInputRef = useRef(null);
     
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -92,26 +97,68 @@ const ChatArea = ({ selectedUser, currentUser }) => {
 
     const handleSendMessage = async (e) => {
         e.preventDefault();
-        if (!newMessage.trim()) return;
+        if (!newMessage.trim() && !selectedImage) return;
 
         try {
             const token = localStorage.getItem('token');
+            const formData = new FormData();
+            formData.append('receiverId', selectedUser);
+            
+            if (newMessage.trim()) {
+                formData.append('content', newMessage.trim());
+            }
+            
+            if (selectedImage) {
+                console.log('Preparing to upload image:', {
+                    name: selectedImage.name,
+                    type: selectedImage.type,
+                    size: selectedImage.size
+                });
+                formData.append('image', selectedImage);
+            }
+
+            console.log('Sending message request to server...');
             const response = await axios.post(
                 'http://localhost:5000/api/messages/send',
+                formData,
                 {
-                    receiverId: selectedUser,
-                    content: newMessage.trim()
-                },
-                {
-                    headers: { Authorization: `Bearer ${token}` }
+                    headers: { 
+                        Authorization: `Bearer ${token}`,
+                        'Content-Type': 'multipart/form-data'
+                    }
                 }
             );
 
+            console.log('Server response:', response.data);
             socket.emit('sendMessage', response.data);
             setNewMessage('');
+            setSelectedImage(null);
+            if (fileInputRef.current) {
+                fileInputRef.current.value = '';
+            }
         } catch (error) {
-            console.error('Error sending message:', error);
+            console.error('Error sending message:', error.response ? {
+                status: error.response.status,
+                data: error.response.data
+            } : error.message);
         }
+    };
+
+    const handleImageSelect = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            console.log('Image selected:', {
+                name: file.name,
+                type: file.type,
+                size: file.size
+            });
+            setSelectedImage(file);
+        }
+    };
+
+    const handleImageClick = (imageUrl) => {
+        setSelectedImageUrl(imageUrl);
+        setIsImageModalOpen(true);
     };
 
     const handleMessageClick = (messageId) => {
@@ -165,7 +212,16 @@ const ChatArea = ({ selectedUser, currentUser }) => {
                                 onClick={() => handleMessageClick(message._id)}
                             >
                                 <div className="message-content">
-                                    {message.content}
+                                    {message.messageType === 'image' ? (
+                                        <img 
+                                            src={message.imageUrl} 
+                                            alt="Shared image" 
+                                            className="message-image"
+                                            onClick={() => handleImageClick(message.imageUrl)}
+                                        />
+                                    ) : (
+                                        message.content
+                                    )}
                                 </div>
                                 <div className="message-timestamp">
                                     {new Date(message.timestamp).toLocaleTimeString()}
@@ -199,10 +255,29 @@ const ChatArea = ({ selectedUser, currentUser }) => {
                     placeholder="Type a message..."
                     className="chat-input"
                 />
+                <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageSelect}
+                    ref={fileInputRef}
+                    style={{ display: 'none' }}
+                />
+                <button 
+                    type="button" 
+                    className="image-upload-button"
+                    onClick={() => fileInputRef.current?.click()}
+                >
+                    📷
+                </button>
                 <button type="submit" className="send-button">
                     Send
                 </button>
             </form>
+            <ImageModal 
+                isOpen={isImageModalOpen}
+                imageUrl={selectedImageUrl}
+                onClose={() => setIsImageModalOpen(false)}
+            />
         </div>
     );
 };

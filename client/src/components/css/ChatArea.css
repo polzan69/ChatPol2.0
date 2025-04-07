@@ -55,6 +55,18 @@
     max-width: 100%;
 }
 
+.message-image {
+    max-width: 100%;
+    max-height: 300px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.message-image:hover {
+    transform: scale(1.02);
+}
+
 .message-timestamp {
     font-size: 0.8em;
     opacity: 0.7;
@@ -85,6 +97,24 @@
     border-radius: 20px;
     font-size: 14px;
     min-width: 0;
+}
+
+.image-upload-button {
+    padding: 10px 15px;
+    background-color: #4185b3;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    border: 5px double white;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.image-upload-button:hover {
+    background-color: #1573b3;
 }
 
 .send-button {
@@ -168,51 +198,56 @@
 
 /* Improve chat area for mobile */
 @media screen and (max-width: 576px) {
-  .chat-area {
-    margin: 5px;
-    height: calc(100vh - 120px);
-  }
-  
-  .chat-messages {
-    padding: 10px;
-  }
-  
-  .message {
-    max-width: 85%;
-    padding: 8px 12px;
-    border-width: 3px;
-  }
-  
-  .message-avatar {
-    width: 30px;
-    height: 30px;
-  }
-  
-  .chat-input-form {
-    padding: 8px 5px;
-    gap: 5px;
-  }
-  
-  .chat-input {
-    padding: 8px 10px;
-    border-width: 3px;
-    font-size: 16px;
-  }
-  
-  .send-button {
-    padding: 8px 12px;
-    border-width: 3px;
-    font-size: 14px;
-  }
-  
-  .message {
-    max-width: 80%;
-    padding: 8px 12px;
-    border-width: 3px;
-    margin: 3px 0;
-  }
-  
-  .message-container {
-    margin-bottom: 5px;
-  }
+    .chat-area {
+        margin: 5px;
+        height: calc(100vh - 120px);
+    }
+    
+    .chat-messages {
+        padding: 10px;
+    }
+    
+    .message {
+        max-width: 85%;
+        padding: 8px 12px;
+        border-width: 3px;
+    }
+    
+    .message-image {
+        max-height: 200px;
+    }
+    
+    .message-avatar {
+        width: 30px;
+        height: 30px;
+    }
+    
+    .chat-input-form {
+        padding: 8px 5px;
+        gap: 5px;
+    }
+    
+    .chat-input {
+        padding: 8px 10px;
+        border-width: 3px;
+        font-size: 16px;
+    }
+    
+    .image-upload-button,
+    .send-button {
+        padding: 8px 12px;
+        border-width: 3px;
+        font-size: 14px;
+    }
+    
+    .message {
+        max-width: 80%;
+        padding: 8px 12px;
+        border-width: 3px;
+        margin: 3px 0;
+    }
+    
+    .message-container {
+        margin-bottom: 5px;
+    }
 }
