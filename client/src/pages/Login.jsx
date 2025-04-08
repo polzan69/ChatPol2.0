@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import MessageBox from '../components/messageBox';
 import io from 'socket.io-client';
+import './css/Login.css';
 
 const socket = io('http://localhost:5000', {
     transports: ['websocket'], // Use WebSocket transport
@@ -14,6 +15,7 @@ function Login() {
     const [password, setPassword] = useState('');
     const [message, setMessage] = useState('');
     const [messageType, setMessageType] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -70,30 +72,62 @@ function Login() {
         setMessageType('');
     };
 
+    const togglePasswordVisibility = () => {
+        setShowPassword(!showPassword);
+    };
+
     return (
-        <div>
+        <div className="auth-container login-container">
             {message && <MessageBox message={message} type={messageType} onClose={handleCloseMessage} />}
-            <h1>Login</h1>
-            <form onSubmit={handleSubmit}>
-                <input
-                    type="email"
-                    placeholder="Email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                />
-                <input
-                    type="password"
-                    placeholder="Password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                />
-                <button type="submit">Login</button>
-            </form>
-            <p>
-                Don't have an account? <button onClick={() => navigate('/signup')}>Sign Up</button>
-            </p>
+            <div className="auth-card">
+                <div className="auth-header">
+                    <h1>Welcome Back!</h1>
+                    <p className="auth-subtitle">Please login to continue</p>
+                </div>
+                <form onSubmit={handleSubmit} className="auth-form">
+                    <div className="form-group">
+                        <input
+                            type="email"
+                            placeholder="Email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            required
+                            className="auth-input"
+                        />
+                    </div>
+                    <div className="form-group password-group">
+                        <input
+                            type={showPassword ? "text" : "password"}
+                            placeholder="Password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            required
+                            className="auth-input"
+                            style={{ width: '81%' }}
+                        />
+                        <button 
+                            type="button"
+                            className="password-toggle"
+                            onClick={togglePasswordVisibility}
+                            aria-label={showPassword ? "Hide password" : "Show password"}
+                        >
+                            {showPassword ? "Hide" : "Show"}
+                        </button>
+                    </div>
+                    <button type="submit" className="auth-button">Login</button>
+                </form>
+                <div className="auth-footer">
+                    <p>
+                        Don't have an account? 
+                        <span 
+                            onClick={() => navigate('/signup')} 
+                            className="auth-link"
+                        >
+                            Sign Up
+                        </span>
+                    </p>
+                </div>
+            </div>
         </div>
     );
 }

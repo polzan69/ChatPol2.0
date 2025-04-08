@@ -1,0 +1,201 @@
+.signup-container.auth-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #4185b3 0%, #366d94 100%);
+    padding: 20px;
+    overflow-y:none;
+}
+
+/* Inherit common styles from Login.css */
+.auth-card {
+    background: white;
+    border-radius: 20px;
+    padding: 40px;
+    width: 100%;
+    max-width: 500px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.auth-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.auth-header h1 {
+    color: #333;
+    font-size: 2em;
+    margin-bottom: 10px;
+}
+
+.auth-subtitle {
+    color: #666;
+    font-size: 1em;
+    margin: 0;
+}
+
+/* SignUp specific styles */
+.form-row {
+    display: flex;
+    /* margin-bottom: 20px; */
+}
+
+.form-row .form-group {
+    flex: 1;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.auth-input {
+    width: 90%;
+    padding: 12px 15px;
+    border: 2px solid #eee;
+    border-radius: 10px;
+    font-size: 1em;
+    transition: all 0.3s ease;
+    outline: none;
+}
+
+.auth-input-first-name {
+    width: 80%;
+    padding: 12px 15px;
+    border: 2px solid #eee;
+    border-radius: 10px;
+    font-size: 1em;
+    transition: all 0.3s ease;
+    outline: none;
+}   
+
+.auth-input-last-name {
+    width: 80%;
+    padding: 12px 15px;
+    border: 2px solid #eee;
+    border-radius: 10px;
+    font-size: 1em;
+    transition: all 0.3s ease;
+    outline: none;
+}
+
+.auth-input:focus {
+    border-color: #4185b3;
+    box-shadow: 0 0 0 3px rgba(65, 133, 179, 0.1);
+}
+
+/* File input styling */
+.file-input-group {
+    margin-bottom: 25px;
+}
+
+.file-input-label {
+    display: block;
+    position: relative;
+    cursor: pointer;
+}
+
+.file-input {
+    opacity: 0;
+    width: 0.1px;
+    height: 0.1px;
+    position: absolute;
+}
+
+.file-input-text {
+    display: block;
+    padding: 12px 15px;
+    background: #f8f9fa;
+    border: 2px dashed #4185b3;
+    border-radius: 10px;
+    text-align: center;
+    color: #666;
+    transition: all 0.3s ease;
+}
+
+.file-input-label:hover .file-input-text {
+    background: #e9ecef;
+    border-color: #366d94;
+}
+
+.auth-button {
+    background: #4185b3;
+    color: white;
+    padding: 12px;
+    border: none;
+    border-radius: 10px;
+    font-size: 1em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    width: 100%;
+}
+
+.auth-button:hover {
+    background: #366d94;
+}
+
+.auth-footer {
+    text-align: center;
+    margin-top: 25px;
+    color: #666;
+}
+
+.auth-link {
+    color: #4185b3;
+    margin-left: 5px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: color 0.3s ease;
+}
+
+.auth-link:hover {
+    color: #366d94;
+    text-decoration: underline;
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+    .auth-card {
+        padding: 30px 20px;
+    }
+
+    .form-row {
+        flex-direction: column;
+        gap: 0;
+        margin-bottom: 0;
+    }
+
+    .auth-header h1 {
+        font-size: 1.75em;
+    }
+}
+
+.password-group {
+    position: relative;
+}
+
+.password-toggle:hover {
+    color: #366d94;
+}
+
+.password-group .auth-input {
+    padding-right: 60px;
+}
+
+/* Remove number input arrows for age field */
+.age-input::-webkit-outer-spin-button,
+.age-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Firefox */
+.age-input[type=number] {
+    -moz-appearance: textfield;
+}
+
+/* Ensure consistent styling with other inputs */
+.age-input {
+    appearance: textfield;
+}

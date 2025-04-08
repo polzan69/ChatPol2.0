@@ -1,0 +1,142 @@
+.login-container.auth-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #4185b3 0%, #366d94 100%);
+    padding: 20px;
+    overflow-y:none;
+}
+
+.auth-card {
+    background: white;
+    border-radius: 20px;
+    padding: 40px;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    margin: 0 auto;
+}
+
+.auth-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.auth-header h1 {
+    color: #333;
+    font-size: 2em;
+    margin-bottom: 10px;
+}
+
+.auth-subtitle {
+    color: #666;
+    font-size: 1em;
+    margin: 0;
+}
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.form-group {
+    position: relative;
+}
+
+.auth-input {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #eee;
+    border-radius: 10px;
+    font-size: 1em;
+    transition: all 0.3s ease;
+    outline: none;
+}
+
+.auth-input:focus {
+    border-color: #4185b3;
+    box-shadow: 0 0 0 3px rgba(65, 133, 179, 0.1);
+}
+
+.auth-button {
+    background: #4185b3;
+    color: white;
+    padding: 12px;
+    border: none;
+    border-radius: 10px;
+    font-size: 1em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 10px;
+}
+
+.auth-button:hover {
+    background: #366d94;
+}
+
+.auth-footer {
+    text-align: center;
+    margin-top: 25px;
+    color: #666;
+}
+
+.auth-link {
+    color: #4185b3;
+    margin-left: 5px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: color 0.3s ease;
+}
+
+.auth-link:hover {
+    color: #366d94;
+    text-decoration: underline;
+}
+
+.password-group {
+    position: relative;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 3% !important;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: white !important;
+    border: none;
+    color: #4185b3 !important ;
+    cursor: pointer;
+    font-size: 0.9em;
+    padding: 3px !important;
+    font-weight: 600 !important;
+    width: 12% !important;
+    transition: color 0.3s ease;
+}
+
+.password-toggle:hover {
+    color: #366d94;
+}
+
+.password-group .auth-input {
+    padding-right: 60px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+    .auth-card {
+        padding: 30px 20px;
+    }
+
+    .auth-header h1 {
+        font-size: 1.75em;
+    }
+    .password-toggle {
+        width: 15% !important;
+        right: 1% !important;
+        background-color: white !important;
+        color: #4185b3 !important;
+    }
+}
