@@ -231,6 +231,25 @@ const Header = ({ user, onUpdate }) => {
         <header className="header">
             <div className="header-title">ChatPol</div>
             
+            <div className="search-container" ref={searchContainerRef}>
+                <input
+                    type="text"
+                    placeholder="Search users..."
+                    value={searchQuery}
+                    onChange={handleSearch}
+                    className="search-input"
+                />
+                {showDropdown && (
+                    <UserSearchDropdown
+                        users={searchResults}
+                        onSendRequest={handleSendRequest}
+                        onClose={() => setShowDropdown(false)}
+                        currentUserFriends={userFriends}
+                        pendingRequests={pendingRequests}
+                    />
+                )}
+            </div>
+            
             <div className="header-user">
                 {!isMobile && <div className="notifications">
                     <button className="notifications-btn" onClick={() => setShowRequests(true)}>
@@ -261,26 +280,7 @@ const Header = ({ user, onUpdate }) => {
                 {!isMobile && <span className="userName">{user?.firstName} {user?.lastName}</span>}
                 <button className="logout-button" onClick={handleLogout}>Logout</button>
             </div>
-            
-            <div className="search-container" ref={searchContainerRef}>
-                <input
-                    type="text"
-                    placeholder="Search users..."
-                    value={searchQuery}
-                    onChange={handleSearch}
-                    className="search-input"
-                />
-                {showDropdown && (
-                    <UserSearchDropdown
-                        users={searchResults}
-                        onSendRequest={handleSendRequest}
-                        onClose={() => setShowDropdown(false)}
-                        currentUserFriends={userFriends}
-                        pendingRequests={pendingRequests}
-                    />
-                )}
-            </div>
-            
+
             {isMobile && <div className="notifications mobile-notifications">
                 <button className="notifications-btn" onClick={() => setShowRequests(true)}>
                     🔔

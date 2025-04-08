@@ -18,8 +18,9 @@ const Dashboard = () => {
     
     const touchStartX = useRef(0);
     const touchEndX = useRef(0);
-    const minSwipeDistance = 50; // Minimum distance for swipe to register
-    const swipeZoneWidth = 30; // Width of area from left edge that activates swipe
+    const minSwipeDistance = 50;
+    const swipeZoneWidth = 30;
+    const isMouseDown = useRef(false);
     
     const navigate = useNavigate();
 
@@ -83,46 +84,54 @@ const Dashboard = () => {
     };
 
     const handleTouchStart = (e) => {
-        touchStartX.current = e.touches[0].clientX;
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        touchStartX.current = clientX;
         
-        // Check if touch started near the left edge
-        if (touchStartX.current <= swipeZoneWidth) {
+        if (clientX <= swipeZoneWidth) {
             setIsSwipeActive(true);
+            if (e.type === 'mousedown') {
+                isMouseDown.current = true;
+            }
+            // Prevent text selection
+            e.preventDefault();
+            document.body.style.userSelect = 'none';
         }
     };
 
     const handleTouchMove = (e) => {
         if (!isSwipeActive) return;
         
-        touchEndX.current = e.touches[0].clientX;
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        touchEndX.current = clientX;
         
-        // If swiping right and sidebar is closed, prevent default to avoid page scrolling
         if (touchEndX.current > touchStartX.current && !showSidebarMobile) {
             e.preventDefault();
         }
+        // Prevent text selection during swipe
+        e.preventDefault();
     };
 
-    const handleTouchEnd = () => {
+    const handleTouchEnd = (e) => {
         if (!isSwipeActive) return;
+        
+        if (e.type === 'mouseup') {
+            isMouseDown.current = false;
+        }
         
         setIsSwipeActive(false);
         
-        // Calculate swipe distance
         const swipeDistance = touchEndX.current - touchStartX.current;
         
-        // If swiped right with enough distance and sidebar is closed
         if (swipeDistance > minSwipeDistance && !showSidebarMobile) {
             setShowSidebarMobile(true);
-        }
-        
-        // If swiped left with enough distance and sidebar is open
-        else if (swipeDistance < -minSwipeDistance && showSidebarMobile) {
+        } else if (swipeDistance < -minSwipeDistance && showSidebarMobile) {
             setShowSidebarMobile(false);
         }
         
-        // Reset touch positions
         touchStartX.current = 0;
         touchEndX.current = 0;
+        // Re-enable text selection
+        document.body.style.userSelect = '';
     };
 
     const handleUserClick = async (userId) => {
@@ -162,19 +171,41 @@ const Dashboard = () => {
     };
 
     useEffect(() => {
-        // Add touch event listeners to the document for mobile swipe
-        if (isMobile) {
+        // Add both touch and mouse event listeners
+        const addEventListeners = () => {
+            // Touch events
             document.addEventListener('touchstart', handleTouchStart, { passive: false });
             document.addEventListener('touchmove', handleTouchMove, { passive: false });
             document.addEventListener('touchend', handleTouchEnd);
             
-            return () => {
-                document.removeEventListener('touchstart', handleTouchStart);
-                document.removeEventListener('touchmove', handleTouchMove);
-                document.removeEventListener('touchend', handleTouchEnd);
-            };
+            // Mouse events
+            document.addEventListener('mousedown', handleTouchStart);
+            document.addEventListener('mousemove', (e) => {
+                if (isMouseDown.current) {
+                    handleTouchMove(e);
+                }
+            });
+            document.addEventListener('mouseup', handleTouchEnd);
+        };
+
+        const removeEventListeners = () => {
+            // Touch events
+            document.removeEventListener('touchstart', handleTouchStart);
+            document.removeEventListener('touchmove', handleTouchMove);
+            document.removeEventListener('touchend', handleTouchEnd);
+            
+            // Mouse events
+            document.removeEventListener('mousedown', handleTouchStart);
+            document.removeEventListener('mousemove', handleTouchMove);
+            document.removeEventListener('mouseup', handleTouchEnd);
+        };
+
+        if (window.innerWidth <= 576) {
+            addEventListeners();
         }
-    }, [isMobile, isSwipeActive, showSidebarMobile]);
+
+        return removeEventListeners;
+    }, [isSwipeActive, showSidebarMobile]);
 
     return (
         <div className="dashboard">

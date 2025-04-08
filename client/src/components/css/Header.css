@@ -1,6 +1,6 @@
 .header {
     display: flex;
-    justify-content: space-between;
+    justify-content: space-evenly;
     align-items: center;
     padding: 20px 20px;
     background-color: #4185b3;
@@ -383,6 +383,11 @@
     border-width: 3px;
     margin-right: 5px;
   }
+
+  .profile-picture:hover {
+    background-color: #1573b3;
+    border: 5px double white;
+  }
   
   .userName {
     margin: 0 5px;
@@ -393,6 +398,12 @@
     padding: 3px 8px;
     font-size: 12px;
     border-width: 3px;
+    margin-left: 5px;
+  }
+
+  .logout-button:hover {
+    background-color: #1573b3;
+    border: 5px double white;
   }
   
   .notifications-btn {
