@@ -5,6 +5,7 @@ import './css/Dashboard.css';
 import socket from '../socket';
 import { useNavigate } from 'react-router-dom';
 import ChatArea from '../components/ChatArea';
+import CreateGroupChat from '../components/CreateGroupChat';
 
 const Dashboard = () => {
     const [users, setUsers] = useState([]);
@@ -15,6 +16,8 @@ const Dashboard = () => {
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 576);
     const [showSidebarMobile, setShowSidebarMobile] = useState(false);
     const [isSwipeActive, setIsSwipeActive] = useState(false);
+    const [showCreateGroup, setShowCreateGroup] = useState(false);
+    const [groups, setGroups] = useState([]);
     
     const touchStartX = useRef(0);
     const touchEndX = useRef(0);
@@ -77,6 +80,22 @@ const Dashboard = () => {
             socket.off('userStatusUpdate');
             window.removeEventListener('friendsListUpdate', fetchUsers);
         };
+    }, []);
+
+    useEffect(() => {
+        const fetchGroups = async () => {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await axios.get('http://localhost:5000/api/groups/list', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                setGroups(response.data);
+            } catch (error) {
+                console.error('Error fetching groups:', error);
+            }
+        };
+
+        fetchGroups();
     }, []);
 
     const toggleSidebar = () => {
@@ -170,6 +189,10 @@ const Dashboard = () => {
         );
     };
 
+    const handleGroupCreated = (newGroup) => {
+        setGroups(prevGroups => [...prevGroups, newGroup]);
+    };
+
     useEffect(() => {
         // Add both touch and mouse event listeners
         const addEventListeners = () => {
@@ -214,6 +237,14 @@ const Dashboard = () => {
                 onUpdate={handleUserUpdate} 
             />
             
+            {/* Create Group Chat Modal */}
+            <CreateGroupChat
+                isOpen={showCreateGroup}
+                onClose={() => setShowCreateGroup(false)}
+                onGroupCreated={handleGroupCreated}
+                currentUser={currentUser}
+            />
+            
             {/* Swipe indicator for mobile */}
             {isMobile && !showSidebarMobile && (
                 <div className={`swipe-indicator ${isSwipeActive ? 'active' : ''}`} />
@@ -231,15 +262,31 @@ const Dashboard = () => {
                 <div className={`user-list ${isSidebarCollapsed ? 'collapsed' : ''} ${showSidebarMobile ? 'visible' : ''}`}>
                     <div className="user-list-header">
                         {!isMobile ? (
-                            <button 
-                                className="toggle-sidebar-btn"
-                                onClick={() => setSidebarCollapsed(!isSidebarCollapsed)}
-                            >
-                                {isSidebarCollapsed ? '→' : '←'}
-                            </button>
+                            <>
+                                {/* <button 
+                                    className="toggle-sidebar-btn"
+                                    onClick={() => setSidebarCollapsed(!isSidebarCollapsed)}
+                                >
+                                    {isSidebarCollapsed ? '→' : '←'}
+                                </button> */}
+                                <button
+                                    className="create-group-btn"
+                                    onClick={() => setShowCreateGroup(true)}
+                                >
+                                    + New Group
+                                </button>
+                            </>
                         ) : (
                             <>
-                                <div className="user-list-title">Friends</div>
+                                <div className="user-list-title">
+                                    Friends
+                                    <button
+                                        className="create-group-btn mobile"
+                                        onClick={() => setShowCreateGroup(true)}
+                                    >
+                                        + New Group
+                                    </button>
+                                </div>
                                 <button 
                                     className="close-sidebar-btn"
                                     onClick={toggleSidebar}
@@ -251,37 +298,66 @@ const Dashboard = () => {
                         )}
                     </div>
                     
-                    {/* User list */}
-                    {users.map(user => (
-                        <div 
-                            key={user._id} 
-                            className={`user-item ${user.status ? user.status.toLowerCase() : 'offline'}`} 
-                            onClick={() => handleUserClick(user._id)}
-                        >
-                            <div className={`status-indicator ${user.status === 'Online' ? 'online' : 'offline'}`}></div>
-                            {user.profilePicture ? (
-                                <img 
-                                    src={user.profilePicture}
-                                    alt={user.firstName} 
-                                    className="user-profile-picture"
-                                    onError={(e) => {
-                                        e.target.onerror = null;
-                                        e.target.src = '/default-avatar.png';
-                                    }}
-                                />
-                            ) : (
-                                <div className="user-profile-picture default-avatar">
-                                    {user.firstName?.charAt(0)}{user.lastName?.charAt(0)}
+                    {/* Groups Section */}
+                    {groups.length > 0 && (
+                        <div className="groups-section">
+                            <h3 className="section-title">Groups</h3>
+                            {groups.map(group => (
+                                <div 
+                                    key={group._id} 
+                                    className={`user-item group-item`} 
+                                    onClick={() => handleUserClick(group._id)}
+                                >
+                                    <div className="group-avatar">
+                                        {group.name.charAt(0)}
+                                    </div>
+                                    {!isSidebarCollapsed && (
+                                        <div className="user-info">
+                                            <span className="user-name">{group.name}</span>
+                                            <span className="group-members">
+                                                {group.members.length} members
+                                            </span>
+                                        </div>
+                                    )}
                                 </div>
-                            )}
-                            {!isSidebarCollapsed && (
-                                <div className="user-info">
-                                    <span className="user-name">{user.firstName} {user.lastName}</span>
-                                    <span className="user-email">{user.email}</span>
-                                </div>
-                            )}
+                            ))}
                         </div>
-                    ))}
+                    )}
+
+                    {/* Direct Messages Section */}
+                    <div className="direct-messages-section">
+                        <h3 className="section-title">Direct Messages</h3>
+                        {users.map(user => (
+                            <div 
+                                key={user._id} 
+                                className={`user-item ${user.status ? user.status.toLowerCase() : 'offline'}`} 
+                                onClick={() => handleUserClick(user._id)}
+                            >
+                                <div className={`status-indicator ${user.status === 'Online' ? 'online' : 'offline'}`}></div>
+                                {user.profilePicture ? (
+                                    <img 
+                                        src={user.profilePicture}
+                                        alt={user.firstName} 
+                                        className="user-profile-picture"
+                                        onError={(e) => {
+                                            e.target.onerror = null;
+                                            e.target.src = '/default-avatar.png';
+                                        }}
+                                    />
+                                ) : (
+                                    <div className="user-profile-picture default-avatar">
+                                        {user.firstName?.charAt(0)}{user.lastName?.charAt(0)}
+                                    </div>
+                                )}
+                                {!isSidebarCollapsed && (
+                                    <div className="user-info">
+                                        <span className="user-name">{user.firstName} {user.lastName}</span>
+                                        <span className="user-email">{user.email}</span>
+                                    </div>
+                                )}
+                            </div>
+                        ))}
+                    </div>
                 </div>
                 
                 {currentUser && (

@@ -258,3 +258,69 @@
     display: block;
   }
 }
+
+.create-group-btn {
+    background: #4185b3;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-size: 0.9em;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-left: 10px;
+}
+
+.create-group-btn:hover {
+    background: #366d94;
+}
+
+.create-group-btn.mobile {
+    padding: 5px 10px;
+    font-size: 0.8em;
+    margin-left: 10px;
+}
+
+.section-title {
+    padding: 10px 15px;
+    color: #666;
+    font-size: 0.9em;
+    font-weight: 600;
+    margin: 0;
+    border-bottom: 1px solid #eee;
+}
+
+.groups-section {
+    margin-bottom: 20px;
+}
+
+.group-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.group-avatar {
+    width: 40px;
+    height: 40px;
+    background: #4185b3;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-size: 1.2em;
+    margin-right: 10px;
+}
+
+.group-members {
+    font-size: 0.8em;
+    color: #666;
+}
+
+.direct-messages-section {
+    border-top: 1px solid #eee;
+}

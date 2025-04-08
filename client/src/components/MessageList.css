@@ -1,0 +1,73 @@
+.message-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem;
+    overflow-y: auto;
+    max-height: calc(100vh - 200px);
+}
+
+.message-container {
+    display: flex;
+    flex-direction: column;
+    max-width: 70%;
+}
+
+.own-message {
+    align-self: flex-end;
+}
+
+.other-message {
+    align-self: flex-start;
+}
+
+.message-sender {
+    font-size: 0.8rem;
+    color: #666;
+    margin-bottom: 0.2rem;
+}
+
+.message-content {
+    background-color: #f0f0f0;
+    padding: 0.8rem;
+    border-radius: 1rem;
+    position: relative;
+}
+
+.own-message .message-content {
+    background-color: #0084ff;
+    color: white;
+}
+
+.message-text {
+    word-wrap: break-word;
+    margin-bottom: 0.4rem;
+}
+
+.message-timestamp {
+    font-size: 0.7rem;
+    color: #888;
+    text-align: right;
+}
+
+.own-message .message-timestamp {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+/* Scrollbar styling */
+.message-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.message-list::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.message-list::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 3px;
+}
+
+.message-list::-webkit-scrollbar-thumb:hover {
+    background: #555;
+} 

@@ -3,6 +3,7 @@ const axios = require('axios');
 const FormData = require('form-data');
 const fs = require('fs');
 const path = require('path');
+const GroupChat = require('../Models/GroupChat');
 
 const getMessages = async (req, res) => {
     try {
@@ -17,7 +18,8 @@ const getMessages = async (req, res) => {
         })
         .sort({ timestamp: 1 })
         .populate('sender', 'firstName lastName profilePicture')
-        .populate('receiver', 'firstName lastName profilePicture');
+        .populate('receiver', 'firstName lastName profilePicture')
+        .populate('groupChat');
 
         res.status(200).json(messages);
     } catch (error) {
@@ -84,7 +86,7 @@ const sendMessage = async (req, res) => {
             } : 'No file attached'
         });
 
-        const { receiverId, content } = req.body;
+        const { receiverId, groupId, content } = req.body;
         const senderId = req.user._id;
         let imageUrl = null;
         let messageType = 'text';
@@ -99,7 +101,8 @@ const sendMessage = async (req, res) => {
 
         const newMessage = new Message({
             sender: senderId,
-            receiver: receiverId,
+            receiver: receiverId || null,
+            groupChat: groupId || null,
             content: content || null,
             imageUrl: imageUrl,
             messageType: messageType
@@ -108,30 +111,33 @@ const sendMessage = async (req, res) => {
         console.log('Saving new message:', {
             messageType,
             hasContent: !!content,
-            hasImage: !!imageUrl
+            hasImage: !!imageUrl,
+            isGroupMessage: !!groupId
         });
 
         await newMessage.save();
 
+        // If this is a group message, update the group's lastMessage
+        if (groupId) {
+            await GroupChat.findByIdAndUpdate(groupId, {
+                lastMessage: newMessage._id
+            });
+        }
+
         const populatedMessage = await Message.findById(newMessage._id)
             .populate('sender', 'firstName lastName profilePicture')
-            .populate('receiver', 'firstName lastName profilePicture');
+            .populate('receiver', 'firstName lastName profilePicture')
+            .populate('groupChat');
 
         console.log('Message saved successfully:', {
             messageId: populatedMessage._id,
-            type: populatedMessage.messageType
+            type: populatedMessage.messageType,
+            isGroupMessage: !!populatedMessage.groupChat
         });
-
-        // Emit to both sender and receiver
-        if (req.io) {
-            req.io.to(receiverId.toString()).emit('newMessage', populatedMessage);
-            req.io.to(senderId.toString()).emit('newMessage', populatedMessage);
-            console.log('Message emitted to both users');
-        }
 
         res.status(201).json(populatedMessage);
     } catch (error) {
-        console.error('Error in sendMessage:', error);
+        console.error('Error sending message:', error);
         res.status(500).json({ message: error.message });
     }
 };

@@ -12,6 +12,7 @@ const ChatArea = ({ selectedUser, currentUser }) => {
     const [selectedImageUrl, setSelectedImageUrl] = useState('');
     const messagesEndRef = useRef(null);
     const [selectedUserData, setSelectedUserData] = useState(null);
+    const [groupData, setGroupData] = useState(null);
     const [showTimestamp, setShowTimestamp] = useState(null);
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 576);
     const fileInputRef = useRef(null);
@@ -24,17 +25,26 @@ const ChatArea = ({ selectedUser, currentUser }) => {
         if (selectedUser && currentUser?._id) {
             fetchMessages();
             
-            // Join user's room
+            // Join user's room and group rooms
             socket.emit('joinRoom', currentUser._id);
             
             // Listen for new messages
             const handleNewMessage = (message) => {
                 console.log('Received message:', message);
+                const isGroupChat = selectedUser.startsWith('group:');
+                const groupId = isGroupChat ? selectedUser.replace('group:', '') : null;
+                
                 if (
-                    (message.sender._id === selectedUser && message.receiver._id === currentUser._id) ||
-                    (message.sender._id === currentUser._id && message.receiver._id === selectedUser)
+                    // For direct messages
+                    (!isGroupChat && message.receiver && (
+                        (message.sender._id === selectedUser && message.receiver._id === currentUser._id) ||
+                        (message.sender._id === currentUser._id && message.receiver._id === selectedUser)
+                    )) ||
+                    // For group messages
+                    (isGroupChat && message.groupChat && message.groupChat._id === groupId)
                 ) {
                     setMessages(prev => [...prev, message]);
+                    scrollToBottom();
                 }
             };
 
@@ -52,7 +62,12 @@ const ChatArea = ({ selectedUser, currentUser }) => {
 
     useEffect(() => {
         if (selectedUser) {
-            fetchSelectedUserData();
+            const isGroupChat = selectedUser.startsWith('group:');
+            if (isGroupChat) {
+                fetchGroupData();
+            } else {
+                fetchSelectedUserData();
+            }
         }
     }, [selectedUser]);
 
@@ -65,23 +80,27 @@ const ChatArea = ({ selectedUser, currentUser }) => {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
-    const fetchMessages = async () => {
+    const fetchGroupData = async () => {
         try {
             const token = localStorage.getItem('token');
+            const groupId = selectedUser.replace('group:', '');
             const response = await axios.get(
-                `http://localhost:5000/api/messages/${selectedUser}`,
+                `http://localhost:5000/api/groups/${groupId}`,
                 {
                     headers: { Authorization: `Bearer ${token}` }
                 }
             );
-            setMessages(response.data);
+            setGroupData(response.data.groupChat);
+            setMessages(response.data.messages || []);
         } catch (error) {
-            console.error('Error fetching messages:', error);
+            console.error('Error fetching group data:', error);
         }
     };
 
     const fetchSelectedUserData = async () => {
         try {
+            if (selectedUser.startsWith('group:')) return; // Skip if it's a group chat
+            
             const token = localStorage.getItem('token');
             const response = await axios.get(
                 `http://localhost:5000/api/users/get/${selectedUser}`,
@@ -95,6 +114,25 @@ const ChatArea = ({ selectedUser, currentUser }) => {
         }
     };
 
+    const fetchMessages = async () => {
+        if (selectedUser.startsWith('group:')) {
+            await fetchGroupData();
+        } else {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await axios.get(
+                    `http://localhost:5000/api/messages/${selectedUser}`,
+                    {
+                        headers: { Authorization: `Bearer ${token}` }
+                    }
+                );
+                setMessages(response.data);
+            } catch (error) {
+                console.error('Error fetching messages:', error);
+            }
+        }
+    };
+
     const handleSendMessage = async (e) => {
         e.preventDefault();
         if (!newMessage.trim() && !selectedImage) return;
@@ -102,18 +140,20 @@ const ChatArea = ({ selectedUser, currentUser }) => {
         try {
             const token = localStorage.getItem('token');
             const formData = new FormData();
-            formData.append('receiverId', selectedUser);
+            
+            // Check if this is a group chat or direct message
+            if (selectedUser.startsWith('group:')) {
+                const groupId = selectedUser.replace('group:', '');
+                formData.append('groupId', groupId);
+            } else {
+                formData.append('receiverId', selectedUser);
+            }
             
             if (newMessage.trim()) {
                 formData.append('content', newMessage.trim());
             }
             
             if (selectedImage) {
-                console.log('Preparing to upload image:', {
-                    name: selectedImage.name,
-                    type: selectedImage.type,
-                    size: selectedImage.size
-                });
                 formData.append('image', selectedImage);
             }
 
@@ -137,10 +177,7 @@ const ChatArea = ({ selectedUser, currentUser }) => {
                 fileInputRef.current.value = '';
             }
         } catch (error) {
-            console.error('Error sending message:', error.response ? {
-                status: error.response.status,
-                data: error.response.data
-            } : error.message);
+            console.error('Error sending message:', error);
         }
     };
 
@@ -165,11 +202,19 @@ const ChatArea = ({ selectedUser, currentUser }) => {
         setShowTimestamp(showTimestamp === messageId ? null : messageId);
     };
 
+    const renderMessageSender = (message) => {
+        const isSentByCurrentUser = message.sender._id === currentUser._id;
+        if (selectedUser.startsWith('group:')) {
+            return isSentByCurrentUser ? 'You' : `${message.sender.firstName} ${message.sender.lastName}`;
+        }
+        return null;
+    };
+
     if (!selectedUser) {
         return (
             <div className="chat-area empty-chat">
                 <div className="empty-chat-message">
-                    Select a user to start chatting
+                    Select a user or group to start chatting
                 </div>
             </div>
         );
@@ -177,15 +222,21 @@ const ChatArea = ({ selectedUser, currentUser }) => {
 
     return (
         <div className="chat-area">
+            {selectedUser.startsWith('group:') && groupData && (
+                <div className="chat-header">
+                    <h3>{groupData.name}</h3>
+                    <span className="group-members">
+                        {groupData.members.length} members
+                    </span>
+                </div>
+            )}
             <div className="chat-messages">
                 {messages.map((message) => {
                     const isSentByCurrentUser = message.sender._id === currentUser._id;
+                    const senderName = renderMessageSender(message);
                     const userProfilePic = isSentByCurrentUser 
                         ? currentUser.profilePicture 
-                        : selectedUserData?.profilePicture;
-                    const userName = isSentByCurrentUser
-                        ? currentUser
-                        : selectedUserData;
+                        : message.sender.profilePicture;
 
                     return (
                         <div
@@ -197,12 +248,12 @@ const ChatArea = ({ selectedUser, currentUser }) => {
                                     {userProfilePic ? (
                                         <img 
                                             src={userProfilePic}
-                                            alt={`${userName?.firstName}'s avatar`}
+                                            alt={`${message.sender.firstName}'s avatar`}
                                         />
                                     ) : (
                                         <div className="default-avatar">
-                                            {userName?.firstName?.charAt(0)}
-                                            {userName?.lastName?.charAt(0)}
+                                            {message.sender.firstName?.charAt(0)}
+                                            {message.sender.lastName?.charAt(0)}
                                         </div>
                                     )}
                                 </div>
@@ -211,6 +262,9 @@ const ChatArea = ({ selectedUser, currentUser }) => {
                                 className={`message ${isSentByCurrentUser ? 'sent' : 'received'} ${showTimestamp === message._id ? 'show-timestamp' : ''}`}
                                 onClick={() => handleMessageClick(message._id)}
                             >
+                                {senderName && (
+                                    <div className="message-sender">{senderName}</div>
+                                )}
                                 <div className="message-content">
                                     {message.messageType === 'image' ? (
                                         <img 
@@ -236,8 +290,8 @@ const ChatArea = ({ selectedUser, currentUser }) => {
                                         />
                                     ) : (
                                         <div className="default-avatar">
-                                            {userName?.firstName?.charAt(0)}
-                                            {userName?.lastName?.charAt(0)}
+                                            {currentUser.firstName?.charAt(0)}
+                                            {currentUser.lastName?.charAt(0)}
                                         </div>
                                     )}
                                 </div>

@@ -10,6 +10,37 @@
     padding: 0;
 }
 
+.chat-header {
+    padding: 15px;
+    background-color: #4185b3;
+    color: white;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.chat-header h3 {
+    margin: 0;
+    font-size: 1.2em;
+}
+
+.group-members {
+    font-size: 0.9em;
+    opacity: 0.9;
+}
+
+.message-sender {
+    font-size: 0.8em;
+    font-weight: bold;
+    margin-bottom: 2px;
+    color: #4185b3;
+}
+
+.message.sent .message-sender {
+    color: white;
+}
+
 .chat-messages {
     flex: 1;
     overflow-y: auto;
