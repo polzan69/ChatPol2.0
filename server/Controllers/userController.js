@@ -64,7 +64,7 @@ const getUsers = async (req, res) => {
 const getUserById = async (req, res) => {
     try {
         const user = await User.findById(req.params.id)
-            .select('firstName lastName email profilePicture status');
+            .select('firstName lastName email profilePicture status age');
             
         if (!user) {
             return res.status(404).json({ message: 'User not found' });

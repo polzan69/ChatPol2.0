@@ -3,13 +3,13 @@ import axios from 'axios';
 import './css/ProfileEditModal.css';
 
 const ProfileEditModal = ({ isOpen, onClose, user, onUpdate }) => {
-    const [firstName, setFirstName] = useState(user.firstName);
-    const [lastName, setLastName] = useState(user.lastName);
-    const [age, setAge] = useState(user.age);
-    const [email, setEmail] = useState(user.email);
+    const [firstName, setFirstName] = useState(user?.firstName || '');
+    const [lastName, setLastName] = useState(user?.lastName || '');
+    const [age, setAge] = useState(user?.age || '');
+    const [email, setEmail] = useState(user?.email || '');
     const [password, setPassword] = useState('');
     const [profilePicture, setProfilePicture] = useState(null);
-    const [preview, setPreview] = useState(user.profilePicture || '');
+    const [preview, setPreview] = useState(user?.profilePicture || '');
 
     const [showPasswordFields, setShowPasswordFields] = useState(false);
     const [currentPassword, setCurrentPassword] = useState('');
@@ -20,10 +20,10 @@ const ProfileEditModal = ({ isOpen, onClose, user, onUpdate }) => {
 
     useEffect(() => {
         if (user) {
-            setFirstName(user.firstName);
-            setLastName(user.lastName);
-            setAge(user.age);
-            setEmail(user.email);
+            setFirstName(user.firstName || '');
+            setLastName(user.lastName || '');
+            setAge(user.age || '');
+            setEmail(user.email || '');
             setPreview(user.profilePicture || '');
         }
     }, [user]);
@@ -151,6 +151,14 @@ const ProfileEditModal = ({ isOpen, onClose, user, onUpdate }) => {
         }
     };
 
+    const handleAgeChange = (e) => {
+        const value = e.target.value;
+        // Only allow positive numbers
+        if (value === '' || (parseInt(value) >= 0 && !value.includes('.'))) {
+            setAge(value);
+        }
+    };
+
     if (!isOpen) return null;
 
     return (
@@ -196,7 +204,20 @@ const ProfileEditModal = ({ isOpen, onClose, user, onUpdate }) => {
                     </div>
                     <div className="profile-form-group">
                         <label>Age:</label>
-                        <input type="number" value={age} onChange={(e) => setAge(e.target.value)} required />
+                        <input 
+                            type="number"
+                            min="0"
+                            value={age}
+                            onChange={handleAgeChange}
+                            onKeyDown={(e) => {
+                                // Prevent the minus sign
+                                if (e.key === '-' || e.key === 'e') {
+                                    e.preventDefault();
+                                }
+                            }}
+                            required 
+                            className="age-input"
+                        />
                     </div>
                     <div className="profile-form-group">
                         <label>Email:</label>
