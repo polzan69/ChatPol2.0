@@ -226,7 +226,7 @@
   }
   
   .user-list-title {
-    font-size: 18px;
+    font-size: 18px !;
     font-weight: bold;
     color: #4185b3;
   }

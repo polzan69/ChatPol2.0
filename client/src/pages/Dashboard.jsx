@@ -231,12 +231,13 @@ const Dashboard = () => {
                 <div className={`user-list ${isSidebarCollapsed ? 'collapsed' : ''} ${showSidebarMobile ? 'visible' : ''}`}>
                     <div className="user-list-header">
                         {!isMobile ? (
-                            <button 
-                                className="toggle-sidebar-btn"
-                                onClick={() => setSidebarCollapsed(!isSidebarCollapsed)}
-                            >
-                                {isSidebarCollapsed ? '→' : '←'}
-                            </button>
+                            // <button 
+                            //     className="toggle-sidebar-btn"
+                            //     onClick={() => setSidebarCollapsed(!isSidebarCollapsed)}
+                            // >
+                            //     {isSidebarCollapsed ? '→' : '←'}
+                            // </button>
+                            <div className="user-list-title" style={{fontSize: '18px !important', fontWeight: 'bold !important', color: '#4185b3 !important'}}>Friends</div>
                         ) : (
                             <>
                                 <div className="user-list-title">Friends</div>
