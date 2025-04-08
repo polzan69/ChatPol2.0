@@ -3,19 +3,23 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, #4185b3 0%, #366d94 100%);
     padding: 20px;
-    overflow-y:none;
+    position: relative;
+    background: none;
 }
 
-.auth-card {
-    background: white;
-    border-radius: 20px;
-    padding: 40px;
+/* Background container with the gif */
+.login-container.auth-container::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
     width: 100%;
-    max-width: 400px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-    margin: 0 auto;
+    height: 100%;
+    background: url('/waves.gif') center center;
+    background-size: cover;
+    opacity: 0.8;
+    z-index: -1;
 }
 
 .auth-header {

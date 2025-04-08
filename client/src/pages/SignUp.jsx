@@ -88,7 +88,7 @@ function SignUp() {
                                 value={firstName}
                                 onChange={(e) => setFirstName(e.target.value)}
                                 required
-                                className="auth-input"
+                                className="auth-input-first-name"
                             />
                         </div>
                         <div className="form-group">
@@ -98,7 +98,7 @@ function SignUp() {
                                 value={lastName}
                                 onChange={(e) => setLastName(e.target.value)}
                                 required
-                                className="auth-input"
+                                className="auth-input-last-name"
                             />
                         </div>
                     </div>
